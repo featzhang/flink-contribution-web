@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>[DISCUSS] FLIP: Streaming-native AI Inference Runtime for Flink</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --bg:#fff;--fg:#1f2328;--muted:#57606a;--border:#d0d7de;--border-soft:#e4e7eb;
+  --accent:#1f6feb;--accent-soft:#ddf4ff;--card:#fff;--header-bg:#f6f8fa;
+  --quote-bg:#f6f8fa;--quote-fg:#6e7781;--trans-bg:#fbfdff;--tag-bg:#f3f4f6;--hover:#f0f3f6;
+}
+body.dark{
+  --bg:#0d1117;--fg:#c9d1d9;--muted:#8b949e;--border:#30363d;--border-soft:#21262d;
+  --accent:#58a6ff;--accent-soft:#1f3a5f;--card:#0d1117;--header-bg:#161b22;
+  --quote-bg:#0b0e13;--quote-fg:#8b949e;--trans-bg:#0f1622;--tag-bg:#161b22;--hover:#161b22;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;font-size:14px;line-height:1.6;margin:0;padding:24px 32px 64px;max-width:none}
+h1{border-bottom:2px solid var(--accent);padding-bottom:8px;font-size:22px;margin:0 0 8px}
+.meta{color:var(--muted);font-size:13px;margin-bottom:18px}
+.meta code{background:var(--tag-bg);padding:2px 6px;border-radius:3px}
+.meta a{color:var(--accent);text-decoration:none}
+.meta a:hover{text-decoration:underline}
+
+.toolbar{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--border);padding:10px 0;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:13px}
+.toolbar button,.toolbar a.btn{background:var(--header-bg);border:1px solid var(--border);padding:5px 12px;border-radius:5px;cursor:pointer;color:var(--fg);font-size:12px;text-decoration:none;display:inline-block}
+.toolbar button:hover,.toolbar a.btn:hover{background:var(--hover);border-color:var(--accent);color:var(--accent)}
+.toolbar .stat{color:var(--muted);font-size:12px;margin-left:auto}
+
+.toc{background:var(--header-bg);border:1px solid var(--border);border-radius:6px;padding:12px 18px;margin-bottom:24px}
+.toc strong{display:block;margin-bottom:8px;font-size:13px}
+.toc-list{list-style:none;padding-left:0;margin:0}
+.toc-list li{padding:3px 0;border-bottom:1px dashed var(--border-soft);font-size:13px}
+.toc-list li:last-child{border-bottom:none}
+.toc-list a{color:var(--accent);text-decoration:none}
+.toc-list a:hover{text-decoration:underline}
+.toc-list .lvl{display:inline-block;color:var(--muted);font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:12px}
+
+.summary-card{background:linear-gradient(135deg,rgba(31,111,235,.06),rgba(130,80,223,.04));border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-bottom:18px;font-size:13px}
+.summary-card h2{font-size:13px;margin:0 0 6px;color:var(--accent)}
+.summary-card ul{margin:6px 0 0 18px;padding:0;color:var(--fg)}
+.summary-card li{margin:2px 0}
+.summary-card a{color:var(--accent)}
+
+.email{border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:6px;margin:18px 0;padding:0;background:var(--card);scroll-margin-top:64px;transition:box-shadow .35s ease}
+.email.flash{box-shadow:0 0 0 3px var(--accent-soft)}
+.email-header{background:var(--header-bg);padding:12px 18px;border-bottom:1px solid var(--border);border-radius:5px 5px 0 0;position:relative}
+.email-header .top-line{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.email-header .num{display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:#fff;border-radius:50%;width:26px;height:26px;font-weight:bold;font-size:13px;flex-shrink:0}
+.email-header .from{font-weight:600;color:var(--fg)}
+.email-header .time{color:var(--muted);font-size:12px}
+.email-header .reply-to{margin-top:6px;font-size:12px;color:var(--muted)}
+.email-header .reply-to a{color:var(--accent);text-decoration:none}
+.email-header .reply-to a:hover{text-decoration:underline}
+.email-header .subject{margin-top:6px;font-size:13px;color:var(--fg);font-weight:500}
+.email-header .mid{color:var(--muted);font-size:11px;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;word-break:break-all;margin-top:4px}
+.anchor-link{position:absolute;top:10px;right:14px;color:var(--muted);font-size:14px;text-decoration:none}
+.anchor-link:hover{color:var(--accent)}
+
+.body-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;padding:14px 20px}
+.orig{min-width:0}
+.trans{min-width:0;border-left:1px dashed var(--border);padding-left:18px;position:relative;background:var(--trans-bg);border-radius:0 4px 4px 0;padding:8px 12px 8px 18px}
+.trans::before{content:"中文翻译";position:absolute;top:-9px;left:12px;background:var(--card);color:var(--accent);font-size:10px;font-weight:600;padding:0 6px;letter-spacing:.08em;border-radius:3px}
+body.hide-trans .body-grid{grid-template-columns:1fr}
+body.hide-trans .trans{display:none}
+@media (max-width:860px){.body-grid{grid-template-columns:1fr}.trans{border-left:none;border-top:1px dashed var(--border);padding-left:0;padding-top:18px;margin-top:6px}.trans::before{top:2px;left:0}}
+
+.body-font{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:13px}
+.trans .body-font{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;font-size:13.5px;line-height:1.7}
+.text-block{margin:0 0 8px;white-space:pre-wrap;word-wrap:break-word;line-height:1.55}
+.text-block:last-child{margin-bottom:0}
+.text-block a{color:var(--accent)}
+.trans-pending{color:var(--muted);font-style:italic;font-size:12px}
+.trans-quote-placeholder{margin:6px 0;min-height:1.4em;opacity:0}
+
+details.quote-block{margin:8px 0;border:1px solid var(--border-soft);border-radius:5px;background:var(--quote-bg)}
+details.quote-block>summary{cursor:pointer;padding:6px 12px;font-size:12px;color:var(--muted);list-style:none;user-select:none;outline:none;border-radius:5px}
+details.quote-block>summary::-webkit-details-marker{display:none}
+details.quote-block>summary::before{content:"▶";display:inline-block;margin-right:6px;transition:transform .15s ease;font-size:10px}
+details.quote-block[open]>summary::before{transform:rotate(90deg)}
+details.quote-block>summary:hover{background:var(--hover)}
+details.quote-block .qpreview{font-style:italic;opacity:.75;margin-left:8px}
+details.quote-block .quoted{padding:8px 12px;border-top:1px solid var(--border-soft);font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:12.5px;line-height:1.5;color:var(--quote-fg);word-wrap:break-word}
+.qd{display:block;white-space:pre-wrap;word-wrap:break-word;min-height:1em}
+.qd-empty{min-height:.5em;border-left-color:transparent !important}
+.qd-1{border-left:3px solid #c8d1da;padding-left:8px}
+.qd-2{border-left:3px solid #d8b4fe;padding-left:8px;margin-left:12px}
+.qd-3{border-left:3px solid #fdba74;padding-left:8px;margin-left:24px}
+.qd-4{border-left:3px solid #86efac;padding-left:8px;margin-left:36px}
+.qd-5{border-left:3px solid #fda4af;padding-left:8px;margin-left:48px}
+
+a{color:var(--accent)}
+a:hover{text-decoration:underline}
+.footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--border-soft);color:var(--muted);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+<h1>[DISCUSS] FLIP: Streaming-native AI Inference Runtime for Flink</h1>
+<div class="meta">
+  Mailing list: <code>dev@flink.apache.org</code> &nbsp;|&nbsp;
+  Thread ID: <code>rn8r7pqfgncd2k3tmy9qfxs6xcslr7lf</code> &nbsp;|&nbsp;
+  Source: <a href="https://lists.apache.org/thread/rn8r7pqfgncd2k3tmy9qfxs6xcslr7lf" target="_blank" rel="noreferrer">lists.apache.org</a> &nbsp;|&nbsp;
+  Total messages: 5
+</div>
+<div class="toolbar">
+  <button onclick="toggleAll(true)">展开所有引用</button>
+  <button onclick="toggleAll(false)">折叠所有引用</button>
+  <button onclick="document.body.classList.toggle('hide-trans')">显示/隐藏中文翻译</button>
+  <button onclick="document.body.classList.toggle('dark')">深色 / 浅色</button>
+  <a class="btn" href="https://lists.apache.org/thread/rn8r7pqfgncd2k3tmy9qfxs6xcslr7lf" target="_blank" rel="noreferrer">↗ lists.apache.org</a>
+  <a class="btn" href="../index.html">← Back to dashboard</a>
+  <span class="stat" id="stat">5 emails · 4 quotes · pending (no translation file)</span>
+</div>
+<div class="toc">
+  <strong>📋 Index（按时间顺序，缩进表示回复层级）</strong>
+  <ul class="toc-list"><li><span class="lvl"></span><a href="#m1"><strong>#1</strong> FeatZhang &lt;fe...@apache.org&gt; &mdash; Sun, 19 Apr 2026 00:09:01 +0800</a></li><li><span class="lvl">&nbsp;&nbsp;&nbsp;&nbsp;└─ </span><a href="#m2"><strong>#2</strong> Shekhar Rajak &lt;rs...@gmail.com&gt; &mdash; Sat, 18 Apr 2026 16:16:03 +0000</a></li><li><span class="lvl">&nbsp;&nbsp;&nbsp;&nbsp;└─ </span><a href="#m3"><strong>#3</strong> FeatZhang &lt;fe...@apache.org&gt; &mdash; Sun, 19 Apr 2026 00:20:54 +0800</a></li><li><span class="lvl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ </span><a href="#m4"><strong>#4</strong> FeatZhang &lt;fe...@apache.org&gt; &mdash; Sun, 19 Apr 2026 00:42:00 +0800</a></li><li><span class="lvl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ </span><a href="#m5"><strong>#5</strong> FeatZhang &lt;fe...@apache.org&gt; &mdash; Sat, 25 Apr 2026 00:05:23 +0800</a></li></ul>
+</div>
+<div class="summary-card">
+  <h2>Mailing-list thread archive</h2>
+  <ul>
+    <li><b>Subject</b>: [DISCUSS] FLIP: Streaming-native AI Inference Runtime for Flink</li>
+    <li><b>Archive</b>: 5 emails · 4 quote blocks · pending (no translation file)</li>
+    <li><b>Source</b>: <a href="https://lists.apache.org/thread/rn8r7pqfgncd2k3tmy9qfxs6xcslr7lf" target="_blank" rel="noreferrer">https://lists.apache.org/thread/rn8r7pqfgncd2k3tmy9qfxs6xcslr7lf</a></li>
+    <li><b>Translation file</b>: <code>rn8r7pqfgncd2k3tmy9qfxs6xcslr7lf.translation.json</code></li>
+  </ul>
+</div>
+<div class="email" id="m1">
+  <div class="email-header">
+    <a class="anchor-link" href="#m1" title="permalink">#</a>
+    <div class="top-line">
+      <span class="num">1</span>
+      <span class="from">FeatZhang &lt;featzhang@apache.org&gt;</span>
+      <span class="time">Sun, 19 Apr 2026 00:09:01 +0800</span>
+    </div>
+    
+    <div class="subject">Subject: [DISCUSS] FLIP: Streaming-native AI Inference Runtime for Flink</div>
+    <div class="mid">Message-ID: &lt;rn8r7pqfgncd2k3tmy9qfxs6xcslr7lf&gt;</div>
+  </div>
+  <div class="body-grid">
+    <div class="orig body-font"><div class="text-block">Hi Flink devs,
+
+I would like to start a discussion on a missing piece in Flink’s current
+AI/ML inference capabilities and propose a FLIP for a *streaming-native AI
+inference runtime layer*.
+Motivation
+
+Apache Flink currently provides basic AI inference capabilities through
+SQL-level constructs such as ML_PREDICT and related functions. These are
+useful for integrating external models into batch and streaming pipelines.
+
+However, in production AI workloads (especially real-time inference and LLM
+serving), we observe several gaps:
+
+   - No unified runtime abstraction for inference execution
+   - No streaming-native batching or latency-aware scheduling
+   - Limited support for backpressure-aware inference control
+   - No built-in retry, fallback, or circuit breaker mechanisms
+   - Fragmented integration with external inference systems (e.g., HTTP
+   services, Triton, LLM endpoints)
+
+As a result, users often re-implement these capabilities in user-defined
+functions, leading to inconsistent behavior and duplicated complexity.
+------------------------------
+Proposal (High-level)
+
+This FLIP proposes introducing a *Streaming-native AI Inference Runtime
+Layer* in Flink, providing:
+
+   - A unified inference operator abstraction
+   - Adaptive batching and concurrency control
+   - Backpressure-aware request scheduling
+   - Pluggable inference backends (HTTP / Triton / custom services)
+   - Built-in reliability mechanisms (retry, timeout, circuit breaker)
+   - Standard metrics and observability hooks
+
+------------------------------
+Design Overview
+
+The high-level architecture would look like:
+
+DataStream / Table API
+        ↓
+Inference Operator Layer
+        ↓
+Inference Execution Engine
+        ↓
+Pluggable Inference Backend
+
+This layer would integrate with Flink’s existing streaming runtime and
+remain fully compatible with current SQL/Table APIs.
+------------------------------
+Non-goals
+
+   - This does NOT replace ML_PREDICT or existing SQL semantics
+   - This does NOT introduce a new ML training framework
+   - This is not tied to any specific inference engine
+
+------------------------------
+Why now
+
+We see increasing adoption of Flink for real-time AI workloads, including:
+
+   - streaming inference
+   - LLM-based pipelines
+   - hybrid AI + data processing workflows
+
+However, the lack of a standardized runtime abstraction makes production
+deployments complex and inconsistent.
+------------------------------
+Request for feedback
+
+I would like feedback on:
+
+   1. Whether a dedicated inference runtime layer fits within Flink’s
+   architectural direction
+   2. Preferred integration approach (Table API, DataStream, or both)
+   3. Scope of built-in features vs user-defined extensibility
+   4. Any existing efforts or ongoing work in this direction
+
+If there is agreement on direction, I will follow up with a more detailed
+FLIP design document.
+------------------------------
+
+Thanks,
+featzhang</div></div>
+    <div class="trans"><div class="body-font"><div class="text-block trans-pending"><em>pending translation</em></div></div></div>
+  </div>
+</div>
+<div class="email" id="m2">
+  <div class="email-header">
+    <a class="anchor-link" href="#m2" title="permalink">#</a>
+    <div class="top-line">
+      <span class="num">2</span>
+      <span class="from">Shekhar Rajak &lt;rshekhar.prasad@gmail.com&gt;</span>
+      <span class="time">Sat, 18 Apr 2026 16:16:03 +0000</span>
+    </div>
+    <div class="reply-to">↩ In reply to <a href="#m1">#1</a></div>
+    <div class="subject">Subject: Re: [DISCUSS] FLIP: Streaming-native AI Inference Runtime for Flink</div>
+    <div class="mid">Message-ID: &lt;l4ofw3obzp495590ytsfcd72q2qoz7jk&gt;</div>
+  </div>
+  <div class="body-grid">
+    <div class="orig body-font"><div class="text-block">Hi,
+I’m trying to understand - what are the features we are talking about which can not be implemented in flink-agents sub project ?
+
+Shekhar 
+
+On Saturday, April 18, 2026, 21:39, FeatZhang &lt;featzhang@apache.org&gt; wrote:
+
+Hi Flink devs,
+
+I would like to start a discussion on a missing piece in Flink’s current
+AI/ML inference capabilities and propose a FLIP for a *streaming-native AI
+inference runtime layer*.
+Motivation
+
+Apache Flink currently provides basic AI inference capabilities through
+SQL-level constructs such as ML_PREDICT and related functions. These are
+useful for integrating external models into batch and streaming pipelines.
+
+However, in production AI workloads (especially real-time inference and LLM
+serving), we observe several gaps:
+
+  - No unified runtime abstraction for inference execution
+  - No streaming-native batching or latency-aware scheduling
+  - Limited support for backpressure-aware inference control
+  - No built-in retry, fallback, or circuit breaker mechanisms
+  - Fragmented integration with external inference systems (e.g., HTTP
+  services, Triton, LLM endpoints)
+
+As a result, users often re-implement these capabilities in user-defined
+functions, leading to inconsistent behavior and duplicated complexity.
+------------------------------
+Proposal (High-level)
+
+This FLIP proposes introducing a *Streaming-native AI Inference Runtime
+Layer* in Flink, providing:
+
+  - A unified inference operator abstraction
+  - Adaptive batching and concurrency control
+  - Backpressure-aware request scheduling
+  - Pluggable inference backends (HTTP / Triton / custom services)
+  - Built-in reliability mechanisms (retry, timeout, circuit breaker)
+  - Standard metrics and observability hooks
+
+------------------------------
+Design Overview
+
+The high-level architecture would look like:
+
+DataStream / Table API
+        ↓
+Inference Operator Layer
+        ↓
+Inference Execution Engine
+        ↓
+Pluggable Inference Backend
+
+This layer would integrate with Flink’s existing streaming runtime and
+remain fully compatible with current SQL/Table APIs.
+------------------------------
+Non-goals
+
+  - This does NOT replace ML_PREDICT or existing SQL semantics
+  - This does NOT introduce a new ML training framework
+  - This is not tied to any specific inference engine
+
+------------------------------
+Why now
+
+We see increasing adoption of Flink for real-time AI workloads, including:
+
+  - streaming inference
+  - LLM-based pipelines
+  - hybrid AI + data processing workflows
+
+However, the lack of a standardized runtime abstraction makes production
+deployments complex and inconsistent.
+------------------------------
+Request for feedback
+
+I would like feedback on:
+
+  1. Whether a dedicated inference runtime layer fits within Flink’s
+  architectural direction
+  2. Preferred integration approach (Table API, DataStream, or both)
+  3. Scope of built-in features vs user-defined extensibility
+  4. Any existing efforts or ongoing work in this direction
+
+If there is agreement on direction, I will follow up with a more detailed
+FLIP design document.
+------------------------------
+
+Thanks,
+featzhang</div></div>
+    <div class="trans"><div class="body-font"><div class="text-block trans-pending"><em>pending translation</em></div></div></div>
+  </div>
+</div>
+<div class="email" id="m3">
+  <div class="email-header">
+    <a class="anchor-link" href="#m3" title="permalink">#</a>
+    <div class="top-line">
+      <span class="num">3</span>
+      <span class="from">FeatZhang &lt;featzhang@apache.org&gt;</span>
+      <span class="time">Sun, 19 Apr 2026 00:20:54 +0800</span>
+    </div>
+    <div class="reply-to">↩ In reply to <a href="#m1">#1</a></div>
+    <div class="subject">Subject: Re: [DISCUSS] FLIP: Streaming-native AI Inference Runtime for Flink</div>
+    <div class="mid">Message-ID: &lt;qc184okp7hwhm7mllgk0x5vqcj42nlcv&gt;</div>
+  </div>
+  <div class="body-grid">
+    <div class="orig body-font"><div class="text-block">Re: [DISCUSS] FLIP: Streaming-native AI Inference Runtime for Flink —
+Additional Context and Implementation Mapping
+
+
+Hi Flink devs,
+
+Thanks for the initial feedback and discussions on the proposed FLIP.
+
+To further clarify the scope and reduce ambiguity, I would like to provide
+an *additional consolidated view of existing implementations, abstraction
+design, and anticipated questions*.
+
+This follow-up aims to clarify that this proposal is based on *existing
+scattered implementations across Flink*, and primarily focuses on unifying
+them into a coherent runtime abstraction.
+------------------------------
+1. Summary of Existing Implementations
+
+The following areas already exist in the codebase and form the foundation
+of this proposal:
+1.1 SQL / Table API inference entry points
+
+   - AsyncBatch-based inference integration for SQL/Table API
+   - Python DataStream API support for async inference workflows
+
+👉 These provide *user-facing entry points for inference execution*, but
+are function-level abstractions.
+------------------------------
+1.2 Streaming inference execution primitives
+
+   - AsyncBatchWaitOperator for asynchronous execution
+   - Retry and timeout handling strategies for inference workloads
+   - Sequence-based batching consistency mechanisms
+
+👉 These represent *low-level execution building blocks*, but are not
+unified under a single runtime abstraction.
+------------------------------
+1.3 Reliability and fault tolerance mechanisms
+
+   - Retry + fallback for inference failures
+   - Circuit breaker for external inference services
+   - Connection pooling for HTTP-based inference backends
+
+👉 These are *production-grade reliability patterns*, currently implemented
+in a distributed manner across components.
+------------------------------
+1.4 External inference backend integration
+
+   - Triton inference integration
+   - HTTP-based inference services
+   - Model-serving backend abstractions (partial)
+
+👉 These enable external model serving integration, but lack a unified
+backend abstraction layer.
+------------------------------
+1.5 Observability and diagnostics
+
+   - Metrics for async inference execution
+   - EXPLAIN plan enhancements (cost, rowcount, watermark visibility)
+   - Web UI improvements for runtime diagnostics
+
+------------------------------
+2. Proposed Abstraction Layer (Refined)
+
+Based on existing implementations, the proposal is to introduce a *unified
+Streaming Inference Runtime layer*.
+2.1 Core abstraction: InferenceOperator
+
+interface InferenceOperator&lt;IN, OUT&gt; {
+
+    void open(Configuration config);
+
+    CompletableFuture&lt;List&lt;OUT&gt;&gt; asyncInvoke(List&lt;IN&gt; batch);
+
+    void close();
+}
+
+Key design goals:
+
+   - batch-oriented execution
+   - async-first model
+   - backpressure-aware scheduling
+   - backend-agnostic execution
+
+------------------------------
+2.2 Inference Execution Engine
+
+A runtime component responsible for:
+
+   - Adaptive batching (size + time-based)
+   - Backpressure-aware scheduling
+   - Retry / timeout / circuit breaker orchestration
+   - Concurrency control per operator instance
+   - Metrics aggregation
+
+------------------------------
+2.3 Pluggable backend model
+
+interface InferenceBackend {
+    CompletableFuture&lt;Response&gt; invoke(Request request);
+}
+
+Supported backends:
+
+   - HTTP / REST services
+   - NVIDIA Triton inference server
+   - Custom inference systems (LLM APIs, internal services)
+
+------------------------------
+3. Design Principle Clarification
+
+To clarify scope:
+This FLIP does NOT:
+
+   - Replace ML_PREDICT
+   - Introduce a new ML framework
+   - Bind to a specific inference engine
+
+This FLIP DOES:
+
+   - Unify existing inference-related runtime capabilities
+   - Introduce a standard execution abstraction
+   - Provide production-grade inference runtime semantics
+
+------------------------------
+4. Mapping: Issues + PRs → FLIP Layers
+
+(See also previous appendix; summarised here for clarity)
+Layer Existing Implementations
+SQL/API AsyncBatchFunction, Table API integration
+Runtime AsyncBatchWaitOperator, retry/timeout logic
+Execution Engine batching, fallback, circuit breaker
+Backend Integration Triton, HTTP inference services
+Observability metrics, EXPLAIN enhancements, UI diagnostics
+------------------------------
+5. FAQ / Clarifications Q1: Is this duplicating ML_PREDICT?
+
+No. ML_PREDICT is a *SQL-level semantic abstraction*, while this proposal
+focuses on *runtime execution layer abstraction*.
+
+They operate at different layers and are complementary.
+------------------------------
+Q2: Why not keep using AsyncFunction / Async I/O?
+
+AsyncFunction provides flexibility but lacks:
+
+   - standardized batching semantics
+   - unified retry/fallback policies
+   - runtime-level scheduling control
+   - backend abstraction consistency
+
+This leads to duplicated implementations across users.
+------------------------------
+Q3: Is this tightly coupled to Triton?
+
+No. Triton is only one supported backend.
+
+The design explicitly supports multiple inference systems (HTTP, LLM APIs,
+custom services).
+------------------------------
+Q4: Does this introduce a new execution engine in Flink?
+
+No.
+
+This is:
+
+   - a new operator abstraction layer
+   - built on top of existing streaming runtime
+   - fully compatible with checkpointing and scheduling
+
+------------------------------
+Q5: Why is this needed now?
+
+With increasing adoption of Flink for:
+
+   - streaming inference
+   - LLM-based pipelines
+   - hybrid data + AI workflows
+
+there is a growing need for a *standardized inference runtime abstraction*,
+rather than fragmented user implementations.
+------------------------------
+6. Closing
+
+Appreciate any feedback on:
+
+   - scope of runtime abstraction
+   - operator vs SQL integration boundary
+   - required minimal feature set for initial version
+
+If there is alignment, I will follow up with a more detailed FLIP design
+document with concrete API evolution and runtime integration plan.
+
+Thanks,
+featzhang
+
+
+FeatZhang &lt;featzhang@apache.org&gt; 于2026年4月19日周日 00:09写道：</div><details class="quote-block"><summary>📎 Quoted · 87 lines · depth 1 <span class="qpreview">Hi Flink devs,</span></summary><div class="quoted"><span class="qd qd-1">Hi Flink devs,</span><span class="qd qd-empty"></span><span class="qd qd-1">I would like to start a discussion on a missing piece in Flink’s current</span><span class="qd qd-1">AI/ML inference capabilities and propose a FLIP for a *streaming-native</span><span class="qd qd-1">AI inference runtime layer*.</span><span class="qd qd-1">Motivation</span><span class="qd qd-empty"></span><span class="qd qd-1">Apache Flink currently provides basic AI inference capabilities through</span><span class="qd qd-1">SQL-level constructs such as ML_PREDICT and related functions. These are</span><span class="qd qd-1">useful for integrating external models into batch and streaming pipelines.</span><span class="qd qd-empty"></span><span class="qd qd-1">However, in production AI workloads (especially real-time inference and</span><span class="qd qd-1">LLM serving), we observe several gaps:</span><span class="qd qd-empty"></span><span class="qd qd-1">   - No unified runtime abstraction for inference execution</span><span class="qd qd-1">   - No streaming-native batching or latency-aware scheduling</span><span class="qd qd-1">   - Limited support for backpressure-aware inference control</span><span class="qd qd-1">   - No built-in retry, fallback, or circuit breaker mechanisms</span><span class="qd qd-1">   - Fragmented integration with external inference systems (e.g., HTTP</span><span class="qd qd-1">   services, Triton, LLM endpoints)</span><span class="qd qd-empty"></span><span class="qd qd-1">As a result, users often re-implement these capabilities in user-defined</span><span class="qd qd-1">functions, leading to inconsistent behavior and duplicated complexity.</span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">Proposal (High-level)</span><span class="qd qd-empty"></span><span class="qd qd-1">This FLIP proposes introducing a *Streaming-native AI Inference Runtime</span><span class="qd qd-1">Layer* in Flink, providing:</span><span class="qd qd-empty"></span><span class="qd qd-1">   - A unified inference operator abstraction</span><span class="qd qd-1">   - Adaptive batching and concurrency control</span><span class="qd qd-1">   - Backpressure-aware request scheduling</span><span class="qd qd-1">   - Pluggable inference backends (HTTP / Triton / custom services)</span><span class="qd qd-1">   - Built-in reliability mechanisms (retry, timeout, circuit breaker)</span><span class="qd qd-1">   - Standard metrics and observability hooks</span><span class="qd qd-empty"></span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">Design Overview</span><span class="qd qd-empty"></span><span class="qd qd-1">The high-level architecture would look like:</span><span class="qd qd-empty"></span><span class="qd qd-1">DataStream / Table API</span><span class="qd qd-1">        ↓</span><span class="qd qd-1">Inference Operator Layer</span><span class="qd qd-1">        ↓</span><span class="qd qd-1">Inference Execution Engine</span><span class="qd qd-1">        ↓</span><span class="qd qd-1">Pluggable Inference Backend</span><span class="qd qd-empty"></span><span class="qd qd-1">This layer would integrate with Flink’s existing streaming runtime and</span><span class="qd qd-1">remain fully compatible with current SQL/Table APIs.</span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">Non-goals</span><span class="qd qd-empty"></span><span class="qd qd-1">   - This does NOT replace ML_PREDICT or existing SQL semantics</span><span class="qd qd-1">   - This does NOT introduce a new ML training framework</span><span class="qd qd-1">   - This is not tied to any specific inference engine</span><span class="qd qd-empty"></span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">Why now</span><span class="qd qd-empty"></span><span class="qd qd-1">We see increasing adoption of Flink for real-time AI workloads, including:</span><span class="qd qd-empty"></span><span class="qd qd-1">   - streaming inference</span><span class="qd qd-1">   - LLM-based pipelines</span><span class="qd qd-1">   - hybrid AI + data processing workflows</span><span class="qd qd-empty"></span><span class="qd qd-1">However, the lack of a standardized runtime abstraction makes production</span><span class="qd qd-1">deployments complex and inconsistent.</span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">Request for feedback</span><span class="qd qd-empty"></span><span class="qd qd-1">I would like feedback on:</span><span class="qd qd-empty"></span><span class="qd qd-1">   1. Whether a dedicated inference runtime layer fits within Flink’s</span><span class="qd qd-1">   architectural direction</span><span class="qd qd-1">   2. Preferred integration approach (Table API, DataStream, or both)</span><span class="qd qd-1">   3. Scope of built-in features vs user-defined extensibility</span><span class="qd qd-1">   4. Any existing efforts or ongoing work in this direction</span><span class="qd qd-empty"></span><span class="qd qd-1">If there is agreement on direction, I will follow up with a more detailed</span><span class="qd qd-1">FLIP design document.</span><span class="qd qd-1">------------------------------</span><span class="qd qd-empty"></span><span class="qd qd-1">Thanks,</span><span class="qd qd-1">featzhang</span><span class="qd qd-empty"></span></div></details></div>
+    <div class="trans"><div class="body-font"><div class="text-block trans-pending"><em>pending translation</em></div><div class="trans-quote-placeholder" aria-hidden="true">&nbsp;</div></div></div>
+  </div>
+</div>
+<div class="email" id="m4">
+  <div class="email-header">
+    <a class="anchor-link" href="#m4" title="permalink">#</a>
+    <div class="top-line">
+      <span class="num">4</span>
+      <span class="from">FeatZhang &lt;featzhang@apache.org&gt;</span>
+      <span class="time">Sun, 19 Apr 2026 00:42:00 +0800</span>
+    </div>
+    <div class="reply-to">↩ In reply to <a href="#m2">#2</a></div>
+    <div class="subject">Subject: Re: [DISCUSS] FLIP: Streaming-native AI Inference Runtime for Flink</div>
+    <div class="mid">Message-ID: &lt;m3jl66bqpyprxzwzrrbdpw0mg9zns039&gt;</div>
+  </div>
+  <div class="body-grid">
+    <div class="orig body-font"><div class="text-block">Hi Shekhar,
+
+Thanks for the question — this is a very important point to clarify.
+
+I think the key distinction here is between *flink-agents as an
+orchestration layer* and the *streaming inference runtime as an execution
+layer inside Flink core*.
+1. What flink-agents typically covers
+
+From my understanding, flink-agents focuses on:
+
+   - high-level AI agent orchestration
+   - tool/function calling patterns
+   - workflow composition of LLM / AI tasks
+   - user-defined inference logic and chaining
+
+In other words, it is primarily an *application / orchestration framework
+built on top of Flink*.
+------------------------------
+2. What this FLIP is targeting (runtime layer)
+
+This proposal is focused on *execution-level capabilities inside Flink
+runtime*, which are typically not handled by flink-agents:
+2.1 Streaming-aware execution semantics
+
+   - adaptive batching under backpressure
+   - latency-aware scheduling of inference requests
+   - concurrency control per operator instance
+
+------------------------------
+2.2 Fault tolerance at runtime level
+
+   - standardized retry / fallback policies
+   - circuit breaker integration
+   - timeout isolation at operator level
+
+These are currently implemented inconsistently in user code or async
+functions.
+------------------------------
+2.3 Backend abstraction and lifecycle management
+
+   - unified inference backend abstraction (HTTP / Triton / custom)
+   - connection pooling and lifecycle management
+   - resource-aware execution coordination
+
+------------------------------
+2.4 Integration with Flink execution model
+
+   - checkpoint-aware inference execution
+   - operator lifecycle integration
+   - coordination with task scheduling and backpressure
+
+------------------------------
+3. Why this cannot be fully handled in flink-agents
+
+The main limitation is that flink-agents operates at a *logical
+orchestration level*, while these requirements are deeply tied to:
+
+   - task scheduling
+   - operator execution semantics
+   - backpressure model
+   - runtime fault tolerance
+
+These are *core streaming engine concerns*, not orchestration logic.
+------------------------------
+4. Relationship between the two
+
+To be clear, I see these as complementary:
+
+   - flink-agents → AI workflow orchestration layer
+   - inference runtime (this FLIP) → execution layer for AI workloads
+   inside Flink
+
+A natural integration point would be:
+flink-agents generating workflows that execute on top of this runtime
+abstraction.
+------------------------------
+5. Open question
+
+It would be great to align on:
+
+   - whether we agree on this layering separation
+   - whether existing flink-agents scope already includes any runtime-level
+   execution concerns that I might have missed
+
+Happy to adjust the proposal if there is overlap.
+
+Thanks,
+featzhang
+
+Shekhar Rajak &lt;rshekhar.prasad@gmail.com&gt; 于2026年4月19日周日 00:17写道：</div><details class="quote-block"><summary>📎 Quoted · 99 lines · depth 1 <span class="qpreview">Hi,</span></summary><div class="quoted"><span class="qd qd-1">Hi,</span><span class="qd qd-1">I’m trying to understand - what are the features we are talking about</span><span class="qd qd-1">which can not be implemented in flink-agents sub project ?</span><span class="qd qd-empty"></span><span class="qd qd-1">Shekhar</span><span class="qd qd-empty"></span><span class="qd qd-1">On Saturday, April 18, 2026, 21:39, FeatZhang &lt;featzhang@apache.org&gt;</span><span class="qd qd-1">wrote:</span><span class="qd qd-empty"></span><span class="qd qd-1">Hi Flink devs,</span><span class="qd qd-empty"></span><span class="qd qd-1">I would like to start a discussion on a missing piece in Flink’s current</span><span class="qd qd-1">AI/ML inference capabilities and propose a FLIP for a *streaming-native AI</span><span class="qd qd-1">inference runtime layer*.</span><span class="qd qd-1">Motivation</span><span class="qd qd-empty"></span><span class="qd qd-1">Apache Flink currently provides basic AI inference capabilities through</span><span class="qd qd-1">SQL-level constructs such as ML_PREDICT and related functions. These are</span><span class="qd qd-1">useful for integrating external models into batch and streaming pipelines.</span><span class="qd qd-empty"></span><span class="qd qd-1">However, in production AI workloads (especially real-time inference and LLM</span><span class="qd qd-1">serving), we observe several gaps:</span><span class="qd qd-empty"></span><span class="qd qd-1">  - No unified runtime abstraction for inference execution</span><span class="qd qd-1">  - No streaming-native batching or latency-aware scheduling</span><span class="qd qd-1">  - Limited support for backpressure-aware inference control</span><span class="qd qd-1">  - No built-in retry, fallback, or circuit breaker mechanisms</span><span class="qd qd-1">  - Fragmented integration with external inference systems (e.g., HTTP</span><span class="qd qd-1">  services, Triton, LLM endpoints)</span><span class="qd qd-empty"></span><span class="qd qd-1">As a result, users often re-implement these capabilities in user-defined</span><span class="qd qd-1">functions, leading to inconsistent behavior and duplicated complexity.</span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">Proposal (High-level)</span><span class="qd qd-empty"></span><span class="qd qd-1">This FLIP proposes introducing a *Streaming-native AI Inference Runtime</span><span class="qd qd-1">Layer* in Flink, providing:</span><span class="qd qd-empty"></span><span class="qd qd-1">  - A unified inference operator abstraction</span><span class="qd qd-1">  - Adaptive batching and concurrency control</span><span class="qd qd-1">  - Backpressure-aware request scheduling</span><span class="qd qd-1">  - Pluggable inference backends (HTTP / Triton / custom services)</span><span class="qd qd-1">  - Built-in reliability mechanisms (retry, timeout, circuit breaker)</span><span class="qd qd-1">  - Standard metrics and observability hooks</span><span class="qd qd-empty"></span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">Design Overview</span><span class="qd qd-empty"></span><span class="qd qd-1">The high-level architecture would look like:</span><span class="qd qd-empty"></span><span class="qd qd-1">DataStream / Table API</span><span class="qd qd-1">        ↓</span><span class="qd qd-1">Inference Operator Layer</span><span class="qd qd-1">        ↓</span><span class="qd qd-1">Inference Execution Engine</span><span class="qd qd-1">        ↓</span><span class="qd qd-1">Pluggable Inference Backend</span><span class="qd qd-empty"></span><span class="qd qd-1">This layer would integrate with Flink’s existing streaming runtime and</span><span class="qd qd-1">remain fully compatible with current SQL/Table APIs.</span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">Non-goals</span><span class="qd qd-empty"></span><span class="qd qd-1">  - This does NOT replace ML_PREDICT or existing SQL semantics</span><span class="qd qd-1">  - This does NOT introduce a new ML training framework</span><span class="qd qd-1">  - This is not tied to any specific inference engine</span><span class="qd qd-empty"></span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">Why now</span><span class="qd qd-empty"></span><span class="qd qd-1">We see increasing adoption of Flink for real-time AI workloads, including:</span><span class="qd qd-empty"></span><span class="qd qd-1">  - streaming inference</span><span class="qd qd-1">  - LLM-based pipelines</span><span class="qd qd-1">  - hybrid AI + data processing workflows</span><span class="qd qd-empty"></span><span class="qd qd-1">However, the lack of a standardized runtime abstraction makes production</span><span class="qd qd-1">deployments complex and inconsistent.</span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">Request for feedback</span><span class="qd qd-empty"></span><span class="qd qd-1">I would like feedback on:</span><span class="qd qd-empty"></span><span class="qd qd-1">  1. Whether a dedicated inference runtime layer fits within Flink’s</span><span class="qd qd-1">  architectural direction</span><span class="qd qd-1">  2. Preferred integration approach (Table API, DataStream, or both)</span><span class="qd qd-1">  3. Scope of built-in features vs user-defined extensibility</span><span class="qd qd-1">  4. Any existing efforts or ongoing work in this direction</span><span class="qd qd-empty"></span><span class="qd qd-1">If there is agreement on direction, I will follow up with a more detailed</span><span class="qd qd-1">FLIP design document.</span><span class="qd qd-1">------------------------------</span><span class="qd qd-empty"></span><span class="qd qd-1">Thanks,</span><span class="qd qd-1">featzhang</span><span class="qd qd-empty"></span><span class="qd qd-empty"></span><span class="qd qd-empty"></span><span class="qd qd-empty"></span></div></details></div>
+    <div class="trans"><div class="body-font"><div class="text-block trans-pending"><em>pending translation</em></div><div class="trans-quote-placeholder" aria-hidden="true">&nbsp;</div></div></div>
+  </div>
+</div>
+<div class="email" id="m5">
+  <div class="email-header">
+    <a class="anchor-link" href="#m5" title="permalink">#</a>
+    <div class="top-line">
+      <span class="num">5</span>
+      <span class="from">FeatZhang &lt;featzhang@apache.org&gt;</span>
+      <span class="time">Sat, 25 Apr 2026 00:05:23 +0800</span>
+    </div>
+    <div class="reply-to">↩ In reply to <a href="#m4">#4</a></div>
+    <div class="subject">Subject: Re: [DISCUSS] FLIP: Streaming-native AI Inference Runtime for Flink</div>
+    <div class="mid">Message-ID: &lt;vcp2rszwbckf30yfcwxhs0f0slm18b6t&gt;</div>
+  </div>
+  <div class="body-grid">
+    <div class="orig body-font"><div class="text-block">Hi all,
+
+Apologies — I forgot to include the document link in my previous mail.
+
+FLIP draft:
+ FLIP-XXX: Streaming-native AI Inference Runtime
+&lt;<a href="https://drive.google.com/open?id=17PpHDjFCeL2wcp9Q7t7snyvKnW2ugBKZ-rtqo_nMKQg&gt;" target="_blank" rel="noopener">https://drive.google.com/open?id=17PpHDjFCeL2wcp9Q7t7snyvKnW2ugBKZ-rtqo_nMKQg&gt;</a>
+
+
+For convenience, the structure of the document is:
+
+§1 Motivation — why a unified inference runtime, and what&#x27;s missing today.
+§2 Public Interfaces — InferenceFunction / InferenceBackend / LoadProbe
+SPI, DataStream and SQL surfaces, configuration keys, module split.
+§3 Proposed Changes — operator internals, batching, retry/timeout, two-tier
+circuit breaker, fault-tolerance semantics, load-aware scheduling loop,
+multi-model demo.
+§4 Compatibility / §5 Migration — incremental, opt-in; no breaking changes
+to existing Async I/O or ML_PREDICT users.
+§6 Test Plan.
+§7 Rejected Alternatives — including why this is not done as an external
+library, why per-call SQL hints are not used for per-model config, and why
+a per-subtask-only circuit breaker is insufficient.
+§8 Future Work.
+Appendix A — concrete PRs (merged and in-review) this FLIP builds on, so
+the net-new code surface is bounded.
+Looking forward to your feedback, especially on the four points raised in
+the previous mail (scope vs ML_PREDICT/flink-agents, LoadProbe SPI surface
+and scoping, two-tier circuit breaker, and module split).
+
+Thanks, featzhang
+
+On Sun, Apr 19, 2026 at 12:42 AM FeatZhang &lt;featzhang@apache.org&gt; wrote:</div><details class="quote-block"><summary>📎 Quoted · 92 lines · depth 1 <span class="qpreview">Hi Shekhar,</span></summary><div class="quoted"><span class="qd qd-1">Hi Shekhar,</span><span class="qd qd-empty"></span><span class="qd qd-1">Thanks for the question — this is a very important point to clarify.</span><span class="qd qd-empty"></span><span class="qd qd-1">I think the key distinction here is between *flink-agents as an</span><span class="qd qd-1">orchestration layer* and the *streaming inference runtime as an execution</span><span class="qd qd-1">layer inside Flink core*.</span><span class="qd qd-1">1. What flink-agents typically covers</span><span class="qd qd-empty"></span><span class="qd qd-1">From my understanding, flink-agents focuses on:</span><span class="qd qd-empty"></span><span class="qd qd-1">   - high-level AI agent orchestration</span><span class="qd qd-1">   - tool/function calling patterns</span><span class="qd qd-1">   - workflow composition of LLM / AI tasks</span><span class="qd qd-1">   - user-defined inference logic and chaining</span><span class="qd qd-empty"></span><span class="qd qd-1">In other words, it is primarily an *application / orchestration framework</span><span class="qd qd-1">built on top of Flink*.</span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">2. What this FLIP is targeting (runtime layer)</span><span class="qd qd-empty"></span><span class="qd qd-1">This proposal is focused on *execution-level capabilities inside Flink</span><span class="qd qd-1">runtime*, which are typically not handled by flink-agents:</span><span class="qd qd-1">2.1 Streaming-aware execution semantics</span><span class="qd qd-empty"></span><span class="qd qd-1">   - adaptive batching under backpressure</span><span class="qd qd-1">   - latency-aware scheduling of inference requests</span><span class="qd qd-1">   - concurrency control per operator instance</span><span class="qd qd-empty"></span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">2.2 Fault tolerance at runtime level</span><span class="qd qd-empty"></span><span class="qd qd-1">   - standardized retry / fallback policies</span><span class="qd qd-1">   - circuit breaker integration</span><span class="qd qd-1">   - timeout isolation at operator level</span><span class="qd qd-empty"></span><span class="qd qd-1">These are currently implemented inconsistently in user code or async</span><span class="qd qd-1">functions.</span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">2.3 Backend abstraction and lifecycle management</span><span class="qd qd-empty"></span><span class="qd qd-1">   - unified inference backend abstraction (HTTP / Triton / custom)</span><span class="qd qd-1">   - connection pooling and lifecycle management</span><span class="qd qd-1">   - resource-aware execution coordination</span><span class="qd qd-empty"></span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">2.4 Integration with Flink execution model</span><span class="qd qd-empty"></span><span class="qd qd-1">   - checkpoint-aware inference execution</span><span class="qd qd-1">   - operator lifecycle integration</span><span class="qd qd-1">   - coordination with task scheduling and backpressure</span><span class="qd qd-empty"></span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">3. Why this cannot be fully handled in flink-agents</span><span class="qd qd-empty"></span><span class="qd qd-1">The main limitation is that flink-agents operates at a *logical</span><span class="qd qd-1">orchestration level*, while these requirements are deeply tied to:</span><span class="qd qd-empty"></span><span class="qd qd-1">   - task scheduling</span><span class="qd qd-1">   - operator execution semantics</span><span class="qd qd-1">   - backpressure model</span><span class="qd qd-1">   - runtime fault tolerance</span><span class="qd qd-empty"></span><span class="qd qd-1">These are *core streaming engine concerns*, not orchestration logic.</span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">4. Relationship between the two</span><span class="qd qd-empty"></span><span class="qd qd-1">To be clear, I see these as complementary:</span><span class="qd qd-empty"></span><span class="qd qd-1">   - flink-agents → AI workflow orchestration layer</span><span class="qd qd-1">   - inference runtime (this FLIP) → execution layer for AI workloads</span><span class="qd qd-1">   inside Flink</span><span class="qd qd-empty"></span><span class="qd qd-1">A natural integration point would be:</span><span class="qd qd-1">flink-agents generating workflows that execute on top of this runtime</span><span class="qd qd-1">abstraction.</span><span class="qd qd-1">------------------------------</span><span class="qd qd-1">5. Open question</span><span class="qd qd-empty"></span><span class="qd qd-1">It would be great to align on:</span><span class="qd qd-empty"></span><span class="qd qd-1">   - whether we agree on this layering separation</span><span class="qd qd-1">   - whether existing flink-agents scope already includes any</span><span class="qd qd-1">   runtime-level execution concerns that I might have missed</span><span class="qd qd-empty"></span><span class="qd qd-1">Happy to adjust the proposal if there is overlap.</span><span class="qd qd-empty"></span><span class="qd qd-1">Thanks,</span><span class="qd qd-1">featzhang</span><span class="qd qd-empty"></span><span class="qd qd-1">Shekhar Rajak &lt;rshekhar.prasad@gmail.com&gt; 于2026年4月19日周日 00:17写道：</span><span class="qd qd-empty"></span></div></details><details class="quote-block"><summary>📎 Quoted · 100 lines · depth 2 <span class="qpreview">Hi,</span></summary><div class="quoted"><span class="qd qd-2">Hi,</span><span class="qd qd-2">I’m trying to understand - what are the features we are talking about</span><span class="qd qd-2">which can not be implemented in flink-agents sub project ?</span><span class="qd qd-empty"></span><span class="qd qd-2">Shekhar</span><span class="qd qd-empty"></span><span class="qd qd-2">On Saturday, April 18, 2026, 21:39, FeatZhang &lt;featzhang@apache.org&gt;</span><span class="qd qd-2">wrote:</span><span class="qd qd-empty"></span><span class="qd qd-2">Hi Flink devs,</span><span class="qd qd-empty"></span><span class="qd qd-2">I would like to start a discussion on a missing piece in Flink’s current</span><span class="qd qd-2">AI/ML inference capabilities and propose a FLIP for a *streaming-native AI</span><span class="qd qd-2">inference runtime layer*.</span><span class="qd qd-2">Motivation</span><span class="qd qd-empty"></span><span class="qd qd-2">Apache Flink currently provides basic AI inference capabilities through</span><span class="qd qd-2">SQL-level constructs such as ML_PREDICT and related functions. These are</span><span class="qd qd-2">useful for integrating external models into batch and streaming pipelines.</span><span class="qd qd-empty"></span><span class="qd qd-2">However, in production AI workloads (especially real-time inference and</span><span class="qd qd-2">LLM</span><span class="qd qd-2">serving), we observe several gaps:</span><span class="qd qd-empty"></span><span class="qd qd-2">  - No unified runtime abstraction for inference execution</span><span class="qd qd-2">  - No streaming-native batching or latency-aware scheduling</span><span class="qd qd-2">  - Limited support for backpressure-aware inference control</span><span class="qd qd-2">  - No built-in retry, fallback, or circuit breaker mechanisms</span><span class="qd qd-2">  - Fragmented integration with external inference systems (e.g., HTTP</span><span class="qd qd-2">  services, Triton, LLM endpoints)</span><span class="qd qd-empty"></span><span class="qd qd-2">As a result, users often re-implement these capabilities in user-defined</span><span class="qd qd-2">functions, leading to inconsistent behavior and duplicated complexity.</span><span class="qd qd-2">------------------------------</span><span class="qd qd-2">Proposal (High-level)</span><span class="qd qd-empty"></span><span class="qd qd-2">This FLIP proposes introducing a *Streaming-native AI Inference Runtime</span><span class="qd qd-2">Layer* in Flink, providing:</span><span class="qd qd-empty"></span><span class="qd qd-2">  - A unified inference operator abstraction</span><span class="qd qd-2">  - Adaptive batching and concurrency control</span><span class="qd qd-2">  - Backpressure-aware request scheduling</span><span class="qd qd-2">  - Pluggable inference backends (HTTP / Triton / custom services)</span><span class="qd qd-2">  - Built-in reliability mechanisms (retry, timeout, circuit breaker)</span><span class="qd qd-2">  - Standard metrics and observability hooks</span><span class="qd qd-empty"></span><span class="qd qd-2">------------------------------</span><span class="qd qd-2">Design Overview</span><span class="qd qd-empty"></span><span class="qd qd-2">The high-level architecture would look like:</span><span class="qd qd-empty"></span><span class="qd qd-2">DataStream / Table API</span><span class="qd qd-2">        ↓</span><span class="qd qd-2">Inference Operator Layer</span><span class="qd qd-2">        ↓</span><span class="qd qd-2">Inference Execution Engine</span><span class="qd qd-2">        ↓</span><span class="qd qd-2">Pluggable Inference Backend</span><span class="qd qd-empty"></span><span class="qd qd-2">This layer would integrate with Flink’s existing streaming runtime and</span><span class="qd qd-2">remain fully compatible with current SQL/Table APIs.</span><span class="qd qd-2">------------------------------</span><span class="qd qd-2">Non-goals</span><span class="qd qd-empty"></span><span class="qd qd-2">  - This does NOT replace ML_PREDICT or existing SQL semantics</span><span class="qd qd-2">  - This does NOT introduce a new ML training framework</span><span class="qd qd-2">  - This is not tied to any specific inference engine</span><span class="qd qd-empty"></span><span class="qd qd-2">------------------------------</span><span class="qd qd-2">Why now</span><span class="qd qd-empty"></span><span class="qd qd-2">We see increasing adoption of Flink for real-time AI workloads, including:</span><span class="qd qd-empty"></span><span class="qd qd-2">  - streaming inference</span><span class="qd qd-2">  - LLM-based pipelines</span><span class="qd qd-2">  - hybrid AI + data processing workflows</span><span class="qd qd-empty"></span><span class="qd qd-2">However, the lack of a standardized runtime abstraction makes production</span><span class="qd qd-2">deployments complex and inconsistent.</span><span class="qd qd-2">------------------------------</span><span class="qd qd-2">Request for feedback</span><span class="qd qd-empty"></span><span class="qd qd-2">I would like feedback on:</span><span class="qd qd-empty"></span><span class="qd qd-2">  1. Whether a dedicated inference runtime layer fits within Flink’s</span><span class="qd qd-2">  architectural direction</span><span class="qd qd-2">  2. Preferred integration approach (Table API, DataStream, or both)</span><span class="qd qd-2">  3. Scope of built-in features vs user-defined extensibility</span><span class="qd qd-2">  4. Any existing efforts or ongoing work in this direction</span><span class="qd qd-empty"></span><span class="qd qd-2">If there is agreement on direction, I will follow up with a more detailed</span><span class="qd qd-2">FLIP design document.</span><span class="qd qd-2">------------------------------</span><span class="qd qd-empty"></span><span class="qd qd-2">Thanks,</span><span class="qd qd-2">featzhang</span><span class="qd qd-empty"></span><span class="qd qd-empty"></span><span class="qd qd-empty"></span><span class="qd qd-empty"></span></div></details></div>
+    <div class="trans"><div class="body-font"><div class="text-block trans-pending"><em>pending translation</em></div><div class="trans-quote-placeholder" aria-hidden="true">&nbsp;</div><div class="trans-quote-placeholder" aria-hidden="true">&nbsp;</div></div></div>
+  </div>
+</div>
+<div class="footer">
+  Generated by <code>dissuss/_build.py</code> from
+  <a href="https://lists.apache.org/thread/rn8r7pqfgncd2k3tmy9qfxs6xcslr7lf" target="_blank" rel="noreferrer">lists.apache.org</a>
+  · Quoted content collapsed by default · Reply relationships shown via "↩ In reply to" links
+</div>
+<script>
+function toggleAll(open){document.querySelectorAll('details.quote-block').forEach(function(d){d.open=open})}
+window.addEventListener('hashchange',function(){
+  var id=location.hash.slice(1);if(!id)return;
+  var el=document.getElementById(id);if(!el)return;
+  el.classList.add('flash');setTimeout(function(){el.classList.remove('flash')},1200);
+});
+// flash on initial load if URL has hash
+window.addEventListener('DOMContentLoaded',function(){
+  if(location.hash){
+    var el=document.getElementById(location.hash.slice(1));
+    if(el){el.classList.add('flash');setTimeout(function(){el.classList.remove('flash')},1200)}
+  }
+});
+</script>
+</body>
+</html>

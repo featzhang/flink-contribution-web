@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>[DISCUSS] FLIP-XXX: Top-N Job Health Dashboard in the Web UI</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --bg:#fff;--fg:#1f2328;--muted:#57606a;--border:#d0d7de;--border-soft:#e4e7eb;
+  --accent:#1f6feb;--accent-soft:#ddf4ff;--card:#fff;--header-bg:#f6f8fa;
+  --quote-bg:#f6f8fa;--quote-fg:#6e7781;--trans-bg:#fbfdff;--tag-bg:#f3f4f6;--hover:#f0f3f6;
+}
+body.dark{
+  --bg:#0d1117;--fg:#c9d1d9;--muted:#8b949e;--border:#30363d;--border-soft:#21262d;
+  --accent:#58a6ff;--accent-soft:#1f3a5f;--card:#0d1117;--header-bg:#161b22;
+  --quote-bg:#0b0e13;--quote-fg:#8b949e;--trans-bg:#0f1622;--tag-bg:#161b22;--hover:#161b22;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;font-size:14px;line-height:1.6;margin:0;padding:24px 32px 64px;max-width:none}
+h1{border-bottom:2px solid var(--accent);padding-bottom:8px;font-size:22px;margin:0 0 8px}
+.meta{color:var(--muted);font-size:13px;margin-bottom:18px}
+.meta code{background:var(--tag-bg);padding:2px 6px;border-radius:3px}
+.meta a{color:var(--accent);text-decoration:none}
+.meta a:hover{text-decoration:underline}
+
+.toolbar{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--border);padding:10px 0;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:13px}
+.toolbar button,.toolbar a.btn{background:var(--header-bg);border:1px solid var(--border);padding:5px 12px;border-radius:5px;cursor:pointer;color:var(--fg);font-size:12px;text-decoration:none;display:inline-block}
+.toolbar button:hover,.toolbar a.btn:hover{background:var(--hover);border-color:var(--accent);color:var(--accent)}
+.toolbar .stat{color:var(--muted);font-size:12px;margin-left:auto}
+
+.toc{background:var(--header-bg);border:1px solid var(--border);border-radius:6px;padding:12px 18px;margin-bottom:24px}
+.toc strong{display:block;margin-bottom:8px;font-size:13px}
+.toc-list{list-style:none;padding-left:0;margin:0}
+.toc-list li{padding:3px 0;border-bottom:1px dashed var(--border-soft);font-size:13px}
+.toc-list li:last-child{border-bottom:none}
+.toc-list a{color:var(--accent);text-decoration:none}
+.toc-list a:hover{text-decoration:underline}
+.toc-list .lvl{display:inline-block;color:var(--muted);font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:12px}
+
+.summary-card{background:linear-gradient(135deg,rgba(31,111,235,.06),rgba(130,80,223,.04));border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-bottom:18px;font-size:13px}
+.summary-card h2{font-size:13px;margin:0 0 6px;color:var(--accent)}
+.summary-card ul{margin:6px 0 0 18px;padding:0;color:var(--fg)}
+.summary-card li{margin:2px 0}
+.summary-card a{color:var(--accent)}
+
+.email{border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:6px;margin:18px 0;padding:0;background:var(--card);scroll-margin-top:64px;transition:box-shadow .35s ease}
+.email.flash{box-shadow:0 0 0 3px var(--accent-soft)}
+.email-header{background:var(--header-bg);padding:12px 18px;border-bottom:1px solid var(--border);border-radius:5px 5px 0 0;position:relative}
+.email-header .top-line{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.email-header .num{display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:#fff;border-radius:50%;width:26px;height:26px;font-weight:bold;font-size:13px;flex-shrink:0}
+.email-header .from{font-weight:600;color:var(--fg)}
+.email-header .time{color:var(--muted);font-size:12px}
+.email-header .reply-to{margin-top:6px;font-size:12px;color:var(--muted)}
+.email-header .reply-to a{color:var(--accent);text-decoration:none}
+.email-header .reply-to a:hover{text-decoration:underline}
+.email-header .subject{margin-top:6px;font-size:13px;color:var(--fg);font-weight:500}
+.email-header .mid{color:var(--muted);font-size:11px;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;word-break:break-all;margin-top:4px}
+.anchor-link{position:absolute;top:10px;right:14px;color:var(--muted);font-size:14px;text-decoration:none}
+.anchor-link:hover{color:var(--accent)}
+
+.body-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;padding:14px 20px}
+.orig{min-width:0}
+.trans{min-width:0;border-left:1px dashed var(--border);padding-left:18px;position:relative;background:var(--trans-bg);border-radius:0 4px 4px 0;padding:8px 12px 8px 18px}
+.trans::before{content:"中文翻译";position:absolute;top:-9px;left:12px;background:var(--card);color:var(--accent);font-size:10px;font-weight:600;padding:0 6px;letter-spacing:.08em;border-radius:3px}
+body.hide-trans .body-grid{grid-template-columns:1fr}
+body.hide-trans .trans{display:none}
+@media (max-width:860px){.body-grid{grid-template-columns:1fr}.trans{border-left:none;border-top:1px dashed var(--border);padding-left:0;padding-top:18px;margin-top:6px}.trans::before{top:2px;left:0}}
+
+.body-font{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:13px}
+.trans .body-font{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;font-size:13.5px;line-height:1.7}
+.text-block{margin:0 0 8px;white-space:pre-wrap;word-wrap:break-word;line-height:1.55}
+.text-block:last-child{margin-bottom:0}
+.text-block a{color:var(--accent)}
+.trans-pending{color:var(--muted);font-style:italic;font-size:12px}
+.trans-quote-placeholder{margin:6px 0;min-height:1.4em;opacity:0}
+
+details.quote-block{margin:8px 0;border:1px solid var(--border-soft);border-radius:5px;background:var(--quote-bg)}
+details.quote-block>summary{cursor:pointer;padding:6px 12px;font-size:12px;color:var(--muted);list-style:none;user-select:none;outline:none;border-radius:5px}
+details.quote-block>summary::-webkit-details-marker{display:none}
+details.quote-block>summary::before{content:"▶";display:inline-block;margin-right:6px;transition:transform .15s ease;font-size:10px}
+details.quote-block[open]>summary::before{transform:rotate(90deg)}
+details.quote-block>summary:hover{background:var(--hover)}
+details.quote-block .qpreview{font-style:italic;opacity:.75;margin-left:8px}
+details.quote-block .quoted{padding:8px 12px;border-top:1px solid var(--border-soft);font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:12.5px;line-height:1.5;color:var(--quote-fg);word-wrap:break-word}
+.qd{display:block;white-space:pre-wrap;word-wrap:break-word;min-height:1em}
+.qd-empty{min-height:.5em;border-left-color:transparent !important}
+.qd-1{border-left:3px solid #c8d1da;padding-left:8px}
+.qd-2{border-left:3px solid #d8b4fe;padding-left:8px;margin-left:12px}
+.qd-3{border-left:3px solid #fdba74;padding-left:8px;margin-left:24px}
+.qd-4{border-left:3px solid #86efac;padding-left:8px;margin-left:36px}
+.qd-5{border-left:3px solid #fda4af;padding-left:8px;margin-left:48px}
+
+a{color:var(--accent)}
+a:hover{text-decoration:underline}
+.footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--border-soft);color:var(--muted);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+<h1>[DISCUSS] FLIP-XXX: Top-N Job Health Dashboard in the Web UI</h1>
+<div class="meta">
+  Mailing list: <code>dev@flink.apache.org</code> &nbsp;|&nbsp;
+  Thread ID: <code>l3ly9o9p1nkm8l0rggq86fw0zf5o7wph</code> &nbsp;|&nbsp;
+  Source: <a href="https://lists.apache.org/thread/l3ly9o9p1nkm8l0rggq86fw0zf5o7wph" target="_blank" rel="noreferrer">lists.apache.org</a> &nbsp;|&nbsp;
+  Total messages: 1
+</div>
+<div class="toolbar">
+  <button onclick="toggleAll(true)">展开所有引用</button>
+  <button onclick="toggleAll(false)">折叠所有引用</button>
+  <button onclick="document.body.classList.toggle('hide-trans')">显示/隐藏中文翻译</button>
+  <button onclick="document.body.classList.toggle('dark')">深色 / 浅色</button>
+  <a class="btn" href="https://lists.apache.org/thread/l3ly9o9p1nkm8l0rggq86fw0zf5o7wph" target="_blank" rel="noreferrer">↗ lists.apache.org</a>
+  <a class="btn" href="../index.html">← Back to dashboard</a>
+  <span class="stat" id="stat">1 emails · 0 quotes · pending (no translation file)</span>
+</div>
+<div class="toc">
+  <strong>📋 Index（按时间顺序，缩进表示回复层级）</strong>
+  <ul class="toc-list"><li><span class="lvl"></span><a href="#m1"><strong>#1</strong> FeatZhang &lt;fe...@apache.org&gt; &mdash; Sun, 03 May 2026 01:51:42 +0800</a></li></ul>
+</div>
+<div class="summary-card">
+  <h2>Mailing-list thread archive</h2>
+  <ul>
+    <li><b>Subject</b>: [DISCUSS] FLIP-XXX: Top-N Job Health Dashboard in the Web UI</li>
+    <li><b>Archive</b>: 1 emails · 0 quote blocks · pending (no translation file)</li>
+    <li><b>Source</b>: <a href="https://lists.apache.org/thread/l3ly9o9p1nkm8l0rggq86fw0zf5o7wph" target="_blank" rel="noreferrer">https://lists.apache.org/thread/l3ly9o9p1nkm8l0rggq86fw0zf5o7wph</a></li>
+    <li><b>Translation file</b>: <code>l3ly9o9p1nkm8l0rggq86fw0zf5o7wph.translation.json</code></li>
+  </ul>
+</div>
+<div class="email" id="m1">
+  <div class="email-header">
+    <a class="anchor-link" href="#m1" title="permalink">#</a>
+    <div class="top-line">
+      <span class="num">1</span>
+      <span class="from">FeatZhang &lt;featzhang@apache.org&gt;</span>
+      <span class="time">Sun, 03 May 2026 01:51:42 +0800</span>
+    </div>
+    
+    <div class="subject">Subject: [DISCUSS] FLIP-XXX: Top-N Job Health Dashboard in the Web UI</div>
+    <div class="mid">Message-ID: &lt;l3ly9o9p1nkm8l0rggq86fw0zf5o7wph&gt;</div>
+  </div>
+  <div class="body-grid">
+    <div class="orig body-font"><div class="text-block">Hi everyone,
+
+I&#x27;d like to start a discussion on a small Web UI FLIP aimed at shortening
+the
+&quot;which subtask should I look at?&quot; loop when triaging a misbehaving job.
+
+*Problem.* When a Flink job lags, slows down, or becomes unstable, operators
+today open the Web UI and click vertex-by-vertex, subtask-by-subtask to find
+the offender. For jobs with many vertices and high parallelism this is slow
+and error-prone, even though the underlying metrics (backpressure, busy
+time,
+FLIP-33 source lag, JVM CPU, JVM GC) are already available in the runtime.
+The gap is not data — it&#x27;s surfacing.
+
+*Proposal.* Add a new &quot;Top N&quot; tab to the job detail page of the Web UI,
+backed by a new REST endpoint GET /jobs/:jobid/metrics/top-n?top=N. The tab
+shows five ranked lists, grouped into two tiers:
+
+Primary triage (per-subtask / per-vertex, expanded by default):
+
+   1. Top Backpressured Subtasks — from backPressuredTimeMsPerSecond,
+   exposed as a ratio in [0, 1].
+   2. Top Busy Subtasks — from busyTimeMsPerSecond, same scaling.
+   3. Top Lagging Sources — any vertex exposing at least one FLIP-33 source
+   metric (pendingRecords, currentFetchEventTimeLag,
+   currentEmitEventTimeLag). Backlog is summed across subtasks; the two
+   lag metrics are taken as max.
+
+JVM diagnostics (TaskManager-scoped, collapsed by default):
+
+   4. Top CPU Consumers — from Status.JVM.CPU.Load.
+   5. Top GC-intensive TaskManagers — from
+   Status.JVM.GarbageCollector.*.Time summed across collectors.
+
+*What this FLIP deliberately does not do.*
+
+   - No new metric is emitted by the runtime. Everything is derived from
+   metrics
+   that already exist.
+   - No new ConfigOption.
+   - No per-job attribution of CPU / GC. Those are JVM-process metrics;
+   per-job
+   attribution requires a slot-to-TM mapping the metric store does not
+   expose
+   today. The FLIP calls this out explicitly, demotes the JVM tier visually,
+   and leaves per-job attribution as future work.
+   - No Top N for checkpoints in this FLIP. Its data source is
+   CheckpointStatsSnapshot, not MetricStore; it fits better as a separate
+   FLIP / JIRA once this one lands.
+   - No changes to any existing endpoint, response body, or metric. The new
+   wire fields are purely additive.
+
+*Open points I&#x27;d most appreciate feedback on.*
+
+   1. *Scope of the JVM tier.* I think CPU/GC are still worth surfacing as
+   TaskManager-scoped rather than dropping them, because they&#x27;re what
+   operators check next after the per-subtask tier. But I&#x27;m open to being
+   convinced that we should gate the whole JVM tier behind per-job
+   attribution landing first.
+   2. *&quot;Source vertex&quot; detection.* The handler treats any vertex that
+   exposes
+   one of the three FLIP-33 metrics as a source, instead of walking the job
+   graph. This is simpler and extends to every FLIP-33-compliant connector
+   automatically. Is there a case where this heuristic would mislabel a
+   non-source vertex as a source? I couldn&#x27;t come up with one, but it&#x27;s the
+   one design choice I&#x27;d like a second pair of eyes on.
+   3. *Missing-value convention.* For source lag I use -1 as a numeric
+   sentinel so the JSON stays flat. The frontend renders &quot;n/a&quot;. Alternative
+   would be to keep the field nullable. Any preference?
+   4. *Ranking of topLaggingSources.* Current order is pendingRecords →
+   fetchLag → emitLag. Happy to change if there&#x27;s a stronger convention in
+   the community.
+
+*Prototype / PR.* A working end-to-end prototype is already up as a draft
+PR against apache/flink:master, so reviewers can try it out while reading
+the FLIP. It&#x27;s meant to show feasibility and make the wire format concrete;
+it is *not* asking for review-to-merge before the FLIP is accepted.
+
+
+[image: image.png]
+
+
+
+   - JIRA: <a href="https://issues.apache.org/jira/browse/FLINK-39489" target="_blank" rel="noopener">https://issues.apache.org/jira/browse/FLINK-39489</a>
+   - PR: <a href="https://github.com/apache/flink/pull/27774" target="_blank" rel="noopener">https://github.com/apache/flink/pull/27774</a>
+   ([FLINK-39489][Web Dashboard] Add Top N Metrics Dashboard,
+   +1900 / -2 across 23 files, branch
+   feature/FLINK-top-n-metrics-dashboard)
+   - FLIP:
+    FLIP-XXX: Top-N Job Health Dashboard in the Web UI
+   &lt;<a href="https://drive.google.com/open?id=1Cq2G1zVWCWmjJNdtO9Cm4vzuDMHIUgyBTldBZZAxNR0&gt;" target="_blank" rel="noopener">https://drive.google.com/open?id=1Cq2G1zVWCWmjJNdtO9Cm4vzuDMHIUgyBTldBZZAxNR0&gt;</a>
+
+*What the prototype already does* (matches the FLIP 1:1):
+
+Backend (flink-runtime):
+
+   - New handler TopNMetricsHandler on
+   GET /jobs/:jobid/metrics/top-n?top=N (default N=5, bounded to a
+   reasonable cap), reading from the existing MetricStore — no new
+   metric is emitted, no ConfigOption is added.
+   - Response body TopNMetricsResponseBody with five additive lists:
+   topBackpressuredSubtasks, topBusySubtasks, topLaggingSources,
+   topCpuConsumers, topGcIntensiveTaskManagers. Missing source lag is
+   encoded as -1.
+   - backPressuredTimeMsPerSecond / busyTimeMsPerSecond are normalized
+   to [0, 1]; source lag aggregates pendingRecords (sum) and the two
+   FLIP-33 lag metrics (max) across subtasks; GC time is summed across
+   collectors per TaskManager.
+   - Unit tests for TopNMetricsHandler covering ranking, capping,
+   missing-metric fallbacks, and the FLIP-33 source-vertex heuristic.
+   - REST API docs and the API snapshot are regenerated; the new topN
+   query parameter is reflected there.
+
+Frontend (flink-runtime-web):
+
+   - New &quot;Top N&quot; tab on the job detail page, wired to the real endpoint
+   (no mock data left behind).
+   - Two-tier layout: the per-subtask tier (backpressure / busy / source
+   lag) is expanded by default; the JVM tier (CPU / GC) is collapsed by
+   default to reflect that it is TaskManager-scoped, not per-job.
+   - Each row links back to the corresponding vertex / subtask / TaskManager
+   page so triage stays one click away from the existing UI; &quot;n/a&quot; is
+   rendered for missing source lag.
+   - The earlier empty &quot;Top N&quot; placeholder on the Overview page has been
+   removed; only the job-scoped tab remains.
+
+*How to try it locally.*
+
+git fetch <a href="https://github.com/apache/flink" target="_blank" rel="noopener">https://github.com/apache/flink</a> refs/pull/27774/head:flink-topn
+git checkout flink-topn
+./mvnw -pl flink-runtime-web -Pskip-webui-build=false -DskipTests \
+    clean install
+# then start any job and open:
+#   <a href="http://&lt;jm-host&gt;:8081/#/job/&lt;jobid&gt;/top-n" target="_blank" rel="noopener">http://&lt;jm-host&gt;:8081/#/job/&lt;jobid&gt;/top-n</a>
+# or hit the REST API directly:
+#   curl <a href="http://&lt;jm-host&gt;:8081/jobs/&lt;jobid&gt;/metrics/top-n?top=10" target="_blank" rel="noopener">http://&lt;jm-host&gt;:8081/jobs/&lt;jobid&gt;/metrics/top-n?top=10</a>
+
+FLIP document (with sample JSON, test plan, and rejected alternatives):
+
+Thanks in advance for the feedback. I&#x27;ll give the thread a full week before
+calling a vote, and longer if discussion is active.
+
+Best regards,
+Feat Zhang</div></div>
+    <div class="trans"><div class="body-font"><div class="text-block trans-pending"><em>pending translation</em></div></div></div>
+  </div>
+</div>
+<div class="footer">
+  Generated by <code>dissuss/_build.py</code> from
+  <a href="https://lists.apache.org/thread/l3ly9o9p1nkm8l0rggq86fw0zf5o7wph" target="_blank" rel="noreferrer">lists.apache.org</a>
+  · Quoted content collapsed by default · Reply relationships shown via "↩ In reply to" links
+</div>
+<script>
+function toggleAll(open){document.querySelectorAll('details.quote-block').forEach(function(d){d.open=open})}
+window.addEventListener('hashchange',function(){
+  var id=location.hash.slice(1);if(!id)return;
+  var el=document.getElementById(id);if(!el)return;
+  el.classList.add('flash');setTimeout(function(){el.classList.remove('flash')},1200);
+});
+// flash on initial load if URL has hash
+window.addEventListener('DOMContentLoaded',function(){
+  if(location.hash){
+    var el=document.getElementById(location.hash.slice(1));
+    if(el){el.classList.add('flash');setTimeout(function(){el.classList.remove('flash')},1200)}
+  }
+});
+</script>
+</body>
+</html>
