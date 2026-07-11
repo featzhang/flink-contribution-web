@@ -549,9 +549,14 @@ pre.code .c { color: var(--text-mute); font-style: italic; }
   .ov-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
 }
 @media (max-width: 820px) {
-  .slide { padding: 9vh 6vw 6vh; }
+  .slide { padding: clamp(60px,8vh,84px) 6vw clamp(22px,4vh,40px); }
   .g2, .g3, .g4 { grid-template-columns: 1fr; }
-  .agenda-list { grid-template-columns: 1fr; }
+  /* 路线图页保持双列并压缩，确保 8 条在微信压缩可视区内一屏放下 */
+  .agenda-list { grid-template-columns: repeat(2, 1fr); gap: .45rem 1.1rem; margin-top: .5rem; }
+  .agenda-item { padding: .38rem .2rem; gap: .6rem; }
+  .agenda-item .idx { font-size: clamp(15px,4.6vw,22px); min-width: 1.5em; }
+  .agenda-item .txt .t { font-size: clamp(12.5px,3.6vw,16px); }
+  .agenda-item .txt .d { font-size: clamp(10.5px,2.9vw,13px); }
   .flow { flex-direction: column; } .flow .arrow { transform: rotate(90deg); }
   .mindmap { flex-direction: column; } .mm-root { flex-basis: auto; }
   .help { display: none; }
@@ -562,8 +567,9 @@ pre.code .c { color: var(--text-mute); font-style: italic; }
   .ov-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
 }
 @media (max-width: 560px) {
-  .slide { padding: 8vh 5vw 7vh; }
+  .slide { padding: clamp(58px,7.5vh,78px) 5vw clamp(20px,3.5vh,36px); }
   .wrap { padding: 0; }
+  .agenda-list { grid-template-columns: repeat(2, 1fr); gap: .4rem 1rem; }
   .cover h1, .divider h2 { font-size: clamp(24px, 7vw, 40px); }
   .cover .big-n, .divider .big-n { font-size: clamp(64px, 22vw, 140px); }
   .kicker { font-size: 11px; letter-spacing: .14em; }
