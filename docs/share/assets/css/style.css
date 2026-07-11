@@ -65,17 +65,15 @@ html, body {
 /* ---------- 幻灯片框架 ---------- */
 .deck { position: fixed; inset: 0; z-index: 1; }
 .slide {
-  position: absolute; inset: 0;
+  position: fixed; inset: 0;
   display: flex; flex-direction: column;
   justify-content: center;
   padding: 5vh 7vw 8vh;
-  opacity: 0; visibility: hidden;
-  transform: translateY(40px) scale(.985);
-  transition: opacity .55s var(--ease), transform .55s var(--ease), visibility .55s;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity .55s var(--ease), visibility .55s;
   overflow: hidden;
 }
-.slide.active   { opacity: 1; visibility: visible; transform: none; }
-.slide.past     { opacity: 0; visibility: hidden; transform: translateY(-40px) scale(.985); }
+.slide.active   { opacity: 1; visibility: visible; pointer-events: auto; }
 /* 顶部章节条留白：内容页下移，封面/分隔页保持居中 */
 .slide { padding-top: 8.5vh; }
 .slide.cover, .slide.divider { padding-top: 5vh; }
@@ -119,7 +117,7 @@ h2.title {
 .card {
   position: relative; background: linear-gradient(180deg, var(--card), var(--card-2));
   border: 1px solid var(--border); border-radius: 16px;
-  padding: 1.4rem 1.5rem; overflow: hidden;
+  padding: 1.4rem 1.5rem; overflow: hidden; min-width: 0;
 }
 .card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
@@ -186,7 +184,7 @@ pre.code {
   background: #0c0c1c; border: 1px solid var(--border); border-radius: 12px;
   padding: 1.1rem 1.3rem; font-family: var(--font-mono);
   font-size: clamp(12px, 1.05vw, 15px); line-height: 1.65; color: #d7d7ee;
-  overflow: auto;
+  overflow: auto; max-width: 100%; white-space: pre;
 }
 pre.code .k { color: var(--purple); font-weight: 500; }
 pre.code .fn { color: var(--blue); }
