@@ -77,9 +77,9 @@ html, body {
 .slide.active   { opacity: 1; visibility: visible; pointer-events: auto; }
 /* 封面/分隔页保持垂直居中（内容少，不会溢出） */
 .slide.cover, .slide.divider { justify-content: center; }
-/* 顶部章节条留白：内容页下移 */
-.slide { padding-top: 6vh; }
-.slide.cover, .slide.divider { padding-top: 4vh; }
+/* 顶部章节条留白：内容页下移，避开固定定位的 .chapnav（top:13px + 高约36px ≈ 49px） */
+.slide { padding-top: clamp(68px, 9vh, 100px); }
+.slide.cover, .slide.divider { padding-top: clamp(60px, 7vh, 84px); }
 
 /* 内容宽度约束：允许内容密集页在压缩后的可视区内纵向滚动，避免被顶出边界 */
 .wrap { width: 100%; max-width: 1400px; margin: 0 auto; max-height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
