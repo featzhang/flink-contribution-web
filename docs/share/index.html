@@ -1160,6 +1160,243 @@ t_env.<span class="fn">register_function</span>(
   </div>
 </section>
 
+<!-- ============ S Agent 开发平台 · 行业参考架构 ============ -->
+<section class="slide" data-chapter="6" data-kicker="行业背景 · Agent 开发平台" data-title="Agent 开发平台 · 行业参考架构（中立视角）">
+  <div class="wrap">
+    <div class="kicker">Industry Reference · 4 层核心 + 2 横切</div>
+    <h2 class="title" style="margin-bottom:.6rem">Agent 开发平台的<span class="hl">通用参考架构</span> · 业界正在收敛的最大公约数</h2>
+
+    <div class="tech-diagram frag" data-frag="1" style="max-width:960px">
+      <svg viewBox="0 0 960 300" role="img" aria-label="Agent 开发平台通用参考架构：四层核心加两层横切">
+        <!-- L4 应用与编排层 -->
+        <rect class="dg-box blue" x="40" y="20" width="900" height="52" rx="10"/>
+        <text class="dg-t blue" x="60" y="42" font-size="13" font-weight="700">L4 · 应用 &amp; 编排层</text>
+        <text class="dg-t blue" x="60" y="62" font-size="12">💬 对话 / 多模态 UI  ·  📥 Agent Inbox  ·  🔀 工作流 / 状态机  ·  🕸️ 多 Agent 协作 A2A  ·  🙋 Human-in-the-Loop</text>
+
+        <!-- L3 认知层（Agent 大脑） -->
+        <rect class="dg-box purple" x="40" y="80" width="900" height="60" rx="10"/>
+        <text class="dg-t purple" x="60" y="100" font-size="13" font-weight="700">L3 · 认知层 · Agent 大脑</text>
+        <rect x="60"  y="108" width="200" height="26" rx="6" style="fill:rgba(108,92,231,.14);stroke:var(--purple);stroke-width:1"/>
+        <rect x="270" y="108" width="200" height="26" rx="6" style="fill:rgba(108,92,231,.14);stroke:var(--purple);stroke-width:1"/>
+        <rect x="480" y="108" width="220" height="26" rx="6" style="fill:rgba(108,92,231,.14);stroke:var(--purple);stroke-width:1"/>
+        <rect x="710" y="108" width="210" height="26" rx="6" style="fill:rgba(108,92,231,.14);stroke:var(--purple);stroke-width:1"/>
+        <text class="dg-t purple" x="160" y="126" text-anchor="middle" font-size="11.5">🧠 Planning · ReAct · 反思</text>
+        <text class="dg-t purple" x="370" y="126" text-anchor="middle" font-size="11.5">💾 短 / 长期 Memory</text>
+        <text class="dg-t purple" x="590" y="126" text-anchor="middle" font-size="11.5">🧪 Evaluation · 回归测试</text>
+        <text class="dg-t purple" x="815" y="126" text-anchor="middle" font-size="11.5">🛡️ Guardrails 护栏</text>
+
+        <!-- L2 能力：工具 · 知识（并列两块） -->
+        <rect class="dg-box yellow" x="40" y="148" width="440" height="52" rx="10"/>
+        <text class="dg-t yellow" x="60" y="168" font-size="13" font-weight="700">L2a · 工具能力 · Tools</text>
+        <text class="dg-t yellow" x="60" y="188" font-size="12">🔌 MCP · 🧰 工具目录 · 🔐 工具级鉴权 · 📦 Function Calling</text>
+
+        <rect class="dg-box red" x="490" y="148" width="450" height="52" rx="10"/>
+        <text class="dg-t red" x="510" y="168" font-size="13" font-weight="700">L2b · 知识 &amp; 上下文 · Context Fabric</text>
+        <text class="dg-t red" x="510" y="188" font-size="12">📚 RAG / GraphRAG · 🕸️ 知识图谱 · 📎 上下文管理</text>
+
+        <!-- L1 模型层 -->
+        <rect class="dg-box green" x="40" y="208" width="900" height="46" rx="10"/>
+        <text class="dg-t green" x="60" y="228" font-size="13" font-weight="700">L1 · 模型层 · LLM Gateway &amp; Routing</text>
+        <text class="dg-t green" x="60" y="246" font-size="12">🌐 多模型统一 API  ·  🧭 智能路由 · 任务 / 成本 / 延迟  ·  🚦 配额与限流  ·  📝 调用审计</text>
+
+        <!-- L0 横切基座 -->
+        <rect class="dg-box" x="40" y="262" width="900" height="32" rx="10" style="fill:rgba(255,255,255,.06);stroke:var(--muted);stroke-dasharray:6 4"/>
+        <text class="dg-t" x="60" y="282" font-size="12.5" font-weight="700">L0 · 横切基座 · 🪪 治理 · AuthZ · Registry  |  🔭 可观测 · Trace · Metrics · Cost · <tspan fill="var(--blue)" font-weight="800">反馈闭环（Flink 流承接）</tspan></text>
+      </svg>
+      <div class="td-cap"><b>业界共识：</b>Agent 平台正在收敛为「<b>模型 · 工具 · 知识 · 认知 · 编排</b>」4 层核心 + 「<b>治理 · 可观测</b>」2 大横切基座——这是当下所有主流方案的最大公约数；其中<b>反馈闭环</b>天然是流场景，业界普遍以 <b>Flink 流</b> 承接 Trace / Metrics / 反馈信号</div>
+    </div>
+
+    <div class="grid g3 mt2">
+      <div class="card blue frag" data-frag="2">
+        <div class="card-h" style="font-size:15px"><span class="ic">🎯</span>为什么必须平台化</div>
+        <ul>
+          <li>Agent = LLM + Memory + Tools + Loop，工程复杂度陡增</li>
+          <li>企业需要<b>可复用 · 可治理 · 可评测</b>的统一底座</li>
+          <li>避免每个团队重复造轮子（编排 / Trace / 护栏 / 评测）</li>
+        </ul>
+      </div>
+      <div class="card purple frag" data-frag="3">
+        <div class="card-h" style="font-size:15px"><span class="ic">🧩</span>主流方案分三档</div>
+        <ul>
+          <li><b>代码级框架</b>：面向开发者，图 / 状态机式编排，最灵活</li>
+          <li><b>低代码平台</b>：面向业务，可视化拖拽 + 工作流</li>
+          <li><b>云厂商托管</b>：企业级 Agent 服务 + 一体化治理</li>
+        </ul>
+      </div>
+      <div class="card green frag" data-frag="4">
+        <div class="card-h" style="font-size:15px"><span class="ic">⛽</span>平台之下 · 数据是燃料</div>
+        <ul>
+          <li><b>训练侧</b>：SFT / RLHF 样本、行为轨迹、偏好数据</li>
+          <li><b>评测侧</b>：Case 回捞、离线 Eval、在线 A/B</li>
+          <li><b>运行侧</b>：Trace / 成本 / 反馈信号 → 持续回流</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="explain frag" data-frag="5">
+      <span class="bulb">🔗</span>
+      <div class="etext"><b>承上启下：</b>Agent 平台能跑起来，靠的是「模型 + 工具 + 知识」；能跑得<b>又快又准又省</b>，靠的是<b>持续的数据供给与反馈闭环</b>——而这恰是当前工程上最难啃的一块。下两页就来看：<b>Agent 训练 / 评测的取数环节</b>，究竟卡在哪、又怎么破。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S Agent 训练评测取数 · 痛点 + 收益 ============ -->
+<section class="slide" data-chapter="6" data-kicker="案例 · Agent 训练评测取数" data-title="Agent 训练 / 评测的取数瓶颈 · 现状 · 根因 · 目标">
+  <div class="wrap">
+    <div class="kicker">Case Study · 场景 → 痛点 → 根因 → 目标</div>
+    <h2 class="title" style="margin-bottom:.6rem">当 Agent 平台真正跑起来：<span class="hl">取数</span>成了迭代节奏的瓶颈</h2>
+
+    <!-- 场景说明（一行不占卡） -->
+    <div class="td-cap frag" data-frag="1" style="margin-top:.2rem;text-align:left">
+      <b>场景：</b>Agent 训练 / 评测的日常——训练样本抽取、评测 Case 回捞、指标计算、Trace 分析；
+      <b>使用者：</b>算法 · 评测 · PM · 分析师；&nbsp;<b>体量：</b>日均 <b>300+</b> 取数任务。
+      <b>两头都卡：</b>离线取数（Spark / SR）<b>慢</b>，在线反馈信号（Flink 流）<b>断</b>——训练评测闭环转不起来
+    </div>
+
+    <div class="grid g3 mt2">
+      <!-- 现状痛点 -->
+      <div class="card red frag" data-frag="2">
+        <div class="card-h" style="font-size:15px"><span class="ic">🐢</span>现状 · 慢</div>
+        <ul>
+          <li>P50 <b>23 min</b> · P90 <b>115 min</b></li>
+          <li>最慢任务跑 <b>5h 后失败</b></li>
+          <li>业务侧「等一顿午饭」是常态</li>
+        </ul>
+      </div>
+      <div class="card red frag" data-frag="2">
+        <div class="card-h" style="font-size:15px"><span class="ic">📉</span>现状 · 不稳</div>
+        <ul>
+          <li>任务成功率仅 <b>~80%</b></li>
+          <li>OOM / 超时 / 数据倾斜频发</li>
+          <li>失败后<b>重试即重跑</b>，代价高</li>
+        </ul>
+      </div>
+      <div class="card red frag" data-frag="2">
+        <div class="card-h" style="font-size:15px"><span class="ic">🕶️</span>现状 · 无预期</div>
+        <ul>
+          <li>提交后<b>盲等</b>：不知跑多久</li>
+          <li>不知能否跑出、结果对不对</li>
+          <li>没有事前诊断、事中反馈</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 根因归纳 -->
+    <div class="card yellow frag" data-frag="3" style="margin-top:1rem">
+      <div class="card-h" style="font-size:15px"><span class="ic">🔎</span>根因归纳 · 三个「缺」</div>
+      <div class="grid g3" style="margin-top:.35rem;gap:.6rem">
+        <div><b>缺路由：</b>无论查询大小都走同一引擎，简单查询被复杂查询拖死</div>
+        <div><b>缺诊断：</b>SQL 反模式（笛卡尔积、全表扫、倾斜 Key）到运行时才暴露</div>
+        <div><b>缺反馈：</b>耗时 / 成本 / 优化建议 提交后无回音，问题不可积累</div>
+      </div>
+    </div>
+
+    <div class="explain frag" data-frag="4">
+      <span class="bulb">🎯</span>
+      <div class="etext"><b>目标很清晰：</b>把取数体验从「<b>慢 · 盲 · 抖</b>」升级到「<b>快 · 稳 · 可预期</b>」——业务提交前有诊断、提交后有预期、失败前有拦截、失败后有归因。下一页看，怎么在 <b>不换引擎</b> 的前提下把这件事做成。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S 应对方案：统一取数服务层 · 架构 + 创新 ============ -->
+<section class="slide" data-chapter="6" data-kicker="方案 · 取数服务层的 AI 化升级" data-title="让「能查数」的服务层，也能「喂得动 Agent」">
+  <div class="wrap">
+    <div class="kicker">Solution · 服务层本就存在，AI 场景倒逼它升级</div>
+    <h2 class="title" style="margin-bottom:.6rem">让<span class="hl">「能查数」</span>的服务层，也能<span class="hl">「喂得动 Agent」</span></h2>
+
+    <div class="tech-diagram frag" data-frag="1" style="max-width:960px">
+      <svg viewBox="0 0 960 260" role="img" aria-label="面向 Agent 训练评测的取数服务层四层架构图">
+        <!-- L4 使用方 -->
+        <rect class="dg-box" x="40" y="12" width="900" height="36" rx="10" style="stroke:var(--muted)"/>
+        <text class="dg-t" x="60" y="34" font-size="12" font-weight="700">L4 · 使用方</text>
+        <text class="dg-s" x="530" y="34" text-anchor="middle" font-size="12">🧑‍🔬 算法 / 评测  ·  📝 PM  ·  📊 分析师  ·  🧑‍💻 数据科学家  ·  🧠 Agent 评测 / 训练样本平台</text>
+
+        <!-- L3 服务层（既有，AI 场景升级 · 4 大新能力） -->
+        <rect class="dg-box purple" x="40" y="60" width="900" height="90" rx="12"/>
+        <text class="dg-t purple" x="60" y="82" font-size="13" font-weight="700">L3 · 面向业务的取数服务层（既有）· 面向 AI 场景升级出 4 大新能力</text>
+        <rect x="60"  y="94" width="205" height="46" rx="7" style="fill:rgba(108,92,231,.14);stroke:var(--purple);stroke-width:1"/>
+        <rect x="275" y="94" width="205" height="46" rx="7" style="fill:rgba(108,92,231,.14);stroke:var(--purple);stroke-width:1"/>
+        <rect x="490" y="94" width="205" height="46" rx="7" style="fill:rgba(108,92,231,.14);stroke:var(--purple);stroke-width:1"/>
+        <rect x="705" y="94" width="215" height="46" rx="7" style="fill:rgba(108,92,231,.14);stroke:var(--purple);stroke-width:1"/>
+        <text class="dg-t purple" x="162" y="112" text-anchor="middle" font-size="12" font-weight="700">🧭 智能路由</text>
+        <text class="dg-t purple" x="162" y="130" text-anchor="middle" font-size="10.5">按复杂度分流</text>
+        <text class="dg-t purple" x="377" y="112" text-anchor="middle" font-size="12" font-weight="700">🩺 规则+AI 诊断</text>
+        <text class="dg-t purple" x="377" y="130" text-anchor="middle" font-size="10.5">提交前拦截</text>
+        <text class="dg-t purple" x="592" y="112" text-anchor="middle" font-size="12" font-weight="700">⚡ 秒级试跑</text>
+        <text class="dg-t purple" x="592" y="130" text-anchor="middle" font-size="10.5">采样即答</text>
+        <text class="dg-t purple" x="812" y="112" text-anchor="middle" font-size="12" font-weight="700">🔁 反馈闭环</text>
+        <text class="dg-t purple" x="812" y="130" text-anchor="middle" font-size="10.5">主动推送优化建议</text>
+
+        <!-- L2 语义与治理 -->
+        <rect class="dg-box yellow" x="40" y="162" width="900" height="36" rx="10"/>
+        <text class="dg-t yellow" x="60" y="184" font-size="12" font-weight="700">L2 · 语义 &amp; 治理</text>
+        <text class="dg-s" x="530" y="184" text-anchor="middle" font-size="12">📖 数据语义模型  ·  🤖 NL2SQL  ·  🛂 数据门禁 · 血缘 · 合规</text>
+
+        <!-- L1 基础引擎 -->
+        <rect class="dg-box green" x="40" y="210" width="900" height="36" rx="10"/>
+        <text class="dg-t green" x="60" y="232" font-size="12" font-weight="700">L1 · 基础引擎（不动）</text>
+        <text class="dg-t green" x="530" y="232" text-anchor="middle" font-size="12">Spark · 批 / 复杂长任务  |  StarRocks · 交互查询  |  <tspan fill="var(--blue)" font-weight="800">Flink · 流 / 反馈信号</tspan>  |  Iceberg · 存储</text>
+
+        <!-- 反馈闭环箭头（L3→L4）· Flink 流回灌 -->
+        <path d="M920,117 Q948,117 948,55 Q948,30 900,30" fill="none" stroke="var(--blue)" stroke-width="1.5" stroke-dasharray="4 3" opacity=".85"/>
+        <polygon points="900,30 908,26 908,34" fill="var(--blue)" opacity=".85"/>
+        <text class="dg-t blue" x="946" y="80" font-size="10" text-anchor="end" font-weight="700">Flink 流回灌</text>
+      </svg>
+      <div class="td-cap"><b>核心思想：</b>引擎不动、服务层不是新造的——面向 BI / 分析师的取数服务本就存在，只是 <b>AI Agent 训练评测</b>带来了高并发采样、快试跑、可观测反馈等<b>新场景</b>，倒逼它长出 <b>4 大新能力</b>：诊断 · 路由 · 试跑 · 反馈，<b>↕ 一一对应</b>上一页的「三个缺」</div>
+    </div>
+
+    <div class="grid g4 mt2">
+      <div class="card purple frag" data-frag="2">
+        <div class="card-h" style="font-size:15px"><span class="ic">🧭</span>智能路由</div>
+        <ul>
+          <li>按复杂度选 Spark / StarRocks</li>
+          <li>红黄绿灯分级 &amp; 兜底</li>
+          <li>治「大小任务互相拖累」</li>
+        </ul>
+      </div>
+      <div class="card blue frag" data-frag="2">
+        <div class="card-h" style="font-size:15px"><span class="ic">🩺</span>规则 + AI 诊断</div>
+        <ul>
+          <li>提交前拦截慢 SQL / 反模式</li>
+          <li>覆盖率 &gt; <b>90%</b></li>
+          <li>治「失败后才知错」</li>
+        </ul>
+      </div>
+      <div class="card yellow frag" data-frag="3">
+        <div class="card-h" style="font-size:15px"><span class="ic">⚡</span>秒级试跑</div>
+        <ul>
+          <li>1% 采样 &lt; <b>3s</b> 出结果</li>
+          <li>省去 100–200× 无效等待</li>
+          <li>治「盲等」</li>
+        </ul>
+      </div>
+      <div class="card green frag" data-frag="3">
+        <div class="card-h" style="font-size:15px"><span class="ic">🔁</span>异步反馈闭环</div>
+        <ul>
+          <li>指标 → 告警 → 优化建议</li>
+          <li>主动推送而非事后追查</li>
+          <li>治「问题不可积累」</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Before / After 精简条 -->
+    <div class="td-cap frag" data-frag="4" style="margin-top:1rem;text-align:center;background:rgba(0,214,163,.06);border:1px solid rgba(0,214,163,.35);padding:.6rem .8rem;border-radius:8px">
+      <b>5 周成绩单：</b>
+      P50 <span class="was">23min</span> → <span class="now">4min</span>（↓83%）&nbsp;·&nbsp;
+      P90 <span class="was">115min</span> → <span class="now">37min</span>（↓68%）&nbsp;·&nbsp;
+      成功率 <span class="was">~80%</span> → <span class="now">95%+</span> &nbsp;·&nbsp;
+      试跑 <span class="was">分钟级</span> → <span class="now">&lt; 3s</span> &nbsp;·&nbsp;
+      诊断覆盖 <span class="was">0%</span> → <span class="now">&gt; 90%</span>
+    </div>
+
+    <div class="explain frag" data-frag="5">
+      <span class="bulb">🔗</span>
+      <div class="etext"><b>一条主线，一个闭环：</b><b>Flink</b> 是 Agent 平台的<b>反馈动脉</b>——上文（Ch 4–5）让流式推理又快又稳，本页让<b>反馈信号（Trace / 指标 / 偏好）秒级回灌</b>；<b>既有服务层沿用 + 升级</b>，把批量取数也做到又快又稳。二者合起来才是 Agent 训练评测的完整闭环：<b>批（Spark/SR）+ 流（Flink）双引擎驱动，服务层统一封装，把预期还给业务</b>。</div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ 第8章 分隔 ============ -->
 <section class="slide divider" data-chapter="7" data-kicker="Chapter 7" data-title="第 7 章 · 开源社区共建">
   <div class="wrap">

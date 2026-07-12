@@ -61,6 +61,8 @@
 
 ### 第 7 章 · 真实落地案例
 - 混元数据管道（端到端 Exactly-Once + 8 模型串联）· Before/After 成绩单
+- **Agent 开发平台 · 行业参考架构（1 页）**：6 层通用架构（L0 治理/可观测 · L1 上下文 · L2 模型 · L3 工具 · L4 认知 · L5 编排 · L6 交互）+ 平台化动因 + 主流三档 + 共同挑战
+- **AI 数据平台 · Agent 训练评测取数（2 页）**：痛点 + Before/After · 统一取数服务层架构 + 四大差异化能力
 
 ### 第 8 章 · 开源社区共建
 - Triton 集成（FLINK-38857）· FLIP-577 AI-Native Flink · 50+ PRs & Upstream First
