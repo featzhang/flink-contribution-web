@@ -62,26 +62,76 @@ html, body {
 .orb.c { width: 300px; height: 300px; background: rgba(0,214,163,.22); top: 40%; right: 20%; animation-delay: -11s; }
 @keyframes float { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,-30px)} }
 
-/* ---------- 幻灯片框架 ---------- */
-.deck { position: fixed; inset: 0; z-index: 1; }
+/* =========================================================
+   幻灯片框架 · 自适应缩放（Auto-fit Scale）
+   -------------------------------------------------------
+   设计基准：1440 × 810（16:9 · PPT 标准）
+   实现思路：
+     - .slide 用固定像素尺寸渲染，保证所有页面视觉一致
+     - JS 根据窗口大小计算等比缩放系数，写入 --scale
+     - transform: scale(--scale) 让内容在任何屏上都"整版"显示
+     - 超宽屏 letterbox、小笔记本自动缩小、4K 屏自动放大
+   ========================================================= */
+:root {
+  --slide-w: 1440px;
+  --slide-h: 810px;
+  --scale: 1;   /* JS 动态覆写 */
+}
+
+.deck {
+  position: fixed; inset: 0; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
 .slide {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  justify-content: center;
-  padding: 5vh 7vw 8vh;
+  position: absolute;
+  top: 50%; left: 50%;
+  width: var(--slide-w); height: var(--slide-h);
+  transform: translate(-50%, -50%) scale(var(--scale)) translateY(40px);
+  transform-origin: center center;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 68px 100px 78px;
   opacity: 0; visibility: hidden;
-  transform: translateY(40px) scale(.985);
   transition: opacity .55s var(--ease), transform .55s var(--ease), visibility .55s;
   overflow: hidden;
 }
-.slide.active   { opacity: 1; visibility: visible; transform: none; }
-.slide.past     { opacity: 0; visibility: hidden; transform: translateY(-40px) scale(.985); }
+.slide.active {
+  opacity: 1; visibility: visible;
+  transform: translate(-50%, -50%) scale(var(--scale));
+}
+.slide.past {
+  opacity: 0; visibility: hidden;
+  transform: translate(-50%, -50%) scale(var(--scale)) translateY(-40px);
+}
 /* 顶部章节条留白：内容页下移，封面/分隔页保持居中 */
-.slide { padding-top: 8.5vh; }
-.slide.cover, .slide.divider { padding-top: 5vh; }
+.slide { padding-top: 96px; }
+.slide.cover, .slide.divider { padding-top: 56px; }
 
 /* 内容宽度约束 */
-.wrap { width: 100%; max-width: 1400px; margin: 0 auto; }
+.wrap { width: 100%; max-width: 1240px; margin: 0 auto; }
+
+/* 单页内容微溢出兜底：允许 wrap 内部纵向缩放（fit-content 策略）
+   仅在内容确实超出时启用，正常内容不受影响 */
+.slide .wrap { max-height: 100%; }
+.slide.autoshrink .wrap {
+  transform: scale(var(--wrap-scale, 1));
+  transform-origin: top center;
+}
+
+/* 竖屏 / 极端小屏兜底（禁用固定尺寸，回到 responsive 流式布局） */
+@media (max-aspect-ratio: 4/5), (max-width: 640px) {
+  .deck { display: block; }
+  .slide {
+    position: absolute; inset: 0;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    transform: none !important;
+    padding: 8.5vh 6vw 6vh;
+  }
+  .slide.active { transform: none !important; }
+  .slide.past { transform: none !important; }
+  .slide.cover, .slide.divider { padding-top: 5vh; }
+}
 
 /* ---------- 通用文本 ---------- */
 .kicker {
@@ -638,6 +688,7 @@ body.notes-on aside.notes::before {
   .deck { display: block; height: auto; }
   .slide {
     position: relative !important; display: block !important;
+    top: auto !important; left: auto !important;
     opacity: 1 !important; transform: none !important;
     width: 100%; height: auto; min-height: 100vh;
     page-break-after: always; break-after: page;
@@ -645,6 +696,7 @@ body.notes-on aside.notes::before {
     color: #111; background: #fff;
     box-shadow: none;
   }
+  .slide.autoshrink .wrap { transform: none !important; }
   .slide .frag { opacity: 1 !important; transform: none !important; }
   .slide .wrap { max-width: 100%; }
   .kicker, .divider .d-sub, .dim, .dg-s { color: #444 !important; }

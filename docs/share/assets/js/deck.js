@@ -11,6 +11,48 @@
   let current = 0;      // 当前页 index
   let fragStep = 0;     // 当前页已揭示的 fragment 数
 
+  /* =========================================================
+     自适应缩放 · Auto-fit Scale
+     - 设计基准：1440 × 810（与 CSS --slide-w/--slide-h 对应）
+     - 根据窗口尺寸计算等比 scale，写入 CSS var
+     - 竖屏/极小屏走 CSS 兜底的 responsive 模式（禁用缩放）
+     ========================================================= */
+  const DESIGN_W = 1440;
+  const DESIGN_H = 810;
+
+  function isResponsiveFallback() {
+    // 与 CSS @media 保持一致：竖屏（<=4/5）或极小屏
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    return w <= 640 || (w / h) <= (4 / 5);
+  }
+
+  function fitScale() {
+    if (isResponsiveFallback()) {
+      document.documentElement.style.removeProperty('--scale');
+      return;
+    }
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const scale = Math.min(w / DESIGN_W, h / DESIGN_H);
+    document.documentElement.style.setProperty('--scale', scale.toFixed(4));
+  }
+
+  fitScale();
+  // 节流：避免连续 resize 触发大量重排
+  let rzTimer = null;
+  function onResize() {
+    if (rzTimer) cancelAnimationFrame(rzTimer);
+    rzTimer = requestAnimationFrame(() => {
+      fitScale();
+      // 也重跑单页内容 fit（因为 fallback 切换可能改变可用高度）
+      if (typeof fitCurrentSlide === 'function') fitCurrentSlide();
+    });
+  }
+  window.addEventListener('resize', onResize);
+  document.addEventListener('fullscreenchange', onResize);
+  window.addEventListener('orientationchange', onResize);
+
   const progress = document.getElementById('progress');
   const counterCur = document.getElementById('cur');
   const counterTot = document.getElementById('tot');
@@ -72,6 +114,35 @@
       .sort((a, b) => (+ (a.dataset.frag || 0)) - (+ (b.dataset.frag || 0)));
   }
 
+  /* ---- 单页内容溢出兜底：如果 wrap 高度超过可视区，二次缩小 ---- */
+  function fitCurrentSlide() {
+    if (isResponsiveFallback()) return;
+    const slide = slides[current];
+    if (!slide) return;
+    const wrap = slide.querySelector('.wrap');
+    if (!wrap) return;
+
+    // 先重置，避免上次缩放影响测量
+    slide.classList.remove('autoshrink');
+    wrap.style.removeProperty('--wrap-scale');
+
+    // 设计基准下的可用高度 = slide 高 - 上下 padding
+    const cs = getComputedStyle(slide);
+    const padTop = parseFloat(cs.paddingTop) || 0;
+    const padBot = parseFloat(cs.paddingBottom) || 0;
+    const avail = DESIGN_H - padTop - padBot;
+
+    // 用 requestAnimationFrame 等布局完成
+    requestAnimationFrame(() => {
+      const contentH = wrap.scrollHeight;
+      if (contentH > avail + 2) {
+        const s = Math.max(0.6, avail / contentH);
+        wrap.style.setProperty('--wrap-scale', s.toFixed(4));
+        slide.classList.add('autoshrink');
+      }
+    });
+  }
+
   /* ---- 渲染当前页状态 ---- */
   function render() {
     slides.forEach((s, i) => {
@@ -92,6 +163,9 @@
     // 顶部章节条高亮
     renderChapnav();
     updateChapTicks();
+
+    // 内容溢出兜底
+    fitCurrentSlide();
 
     location.hash = 'p' + (current + 1);
   }
