@@ -271,6 +271,46 @@ pre.code .c { color: var(--text-mute); font-style: italic; }
 .divider .accent { width: 64px; height: 5px; background: var(--purple); border-radius: 3px; margin: 1.2rem auto; }
 .divider .d-sub { color: var(--text-dim); font-size: clamp(14px,1.4vw,20px); }
 
+/* 章节金句（讲师式判断） */
+.divider .d-quote {
+  margin-top: 1.6rem;
+  font-family: var(--font-en), "PingFang SC", serif;
+  font-style: italic; font-weight: 500;
+  color: var(--text-mute);
+  font-size: clamp(13px, 1.15vw, 17px);
+  max-width: 62ch; margin-left: auto; margin-right: auto;
+  padding: .55em 1.2em;
+  border-left: 3px solid var(--purple);
+  border-right: 3px solid var(--purple);
+  background: rgba(183,117,255,.05);
+  border-radius: 4px;
+  line-height: 1.6;
+  opacity: 0; transform: translateY(6px);
+  transition: opacity .55s .35s var(--ease), transform .55s .35s var(--ease);
+}
+.divider .d-quote b { color: var(--text); font-style: normal; font-weight: 700; }
+.slide.active .divider .d-quote,
+.divider.active .d-quote { opacity: 1; transform: translateY(0); }
+
+/* 个人判断卡片（Ch 8 建议页） */
+.bet {
+  margin-top: 1rem;
+  border-radius: 12px;
+  padding: .8em 1.1em;
+  background: linear-gradient(135deg, rgba(183,117,255,.10), rgba(0,214,163,.06));
+  border: 1px solid rgba(183,117,255,.32);
+  box-shadow: 0 8px 22px rgba(0,0,0,.16);
+}
+.bet .bet-tag {
+  font-size: 12.5px; font-weight: 800; letter-spacing: .05em;
+  color: var(--purple); margin-bottom: .35em;
+}
+.bet .bet-body {
+  font-size: 14px; line-height: 1.7; color: var(--text);
+  font-style: italic;
+}
+.bet .bet-body b { font-style: normal; }
+
 /* agenda */
 .agenda-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: .8rem 2.2rem; margin-top: .8rem; }
 .agenda-item { display: flex; align-items: center; gap: 1rem; padding: .7rem .3rem; border-bottom: 1px dashed var(--border); }
@@ -548,4 +588,76 @@ pre.code .c { color: var(--text-mute); font-style: italic; }
   .flow { flex-direction: column; } .flow .arrow { transform: rotate(90deg); }
   .mindmap { flex-direction: column; } .mm-root { flex-basis: auto; }
   .help { display: none; }
+}
+
+/* =========================================================
+   Speaker notes · 讲师小抄（默认隐藏，N 键切换）
+   ========================================================= */
+aside.notes { display: none; }
+body.notes-on aside.notes {
+  display: block;
+  position: fixed;
+  right: 24px; bottom: 90px;
+  z-index: 30;
+  max-width: 380px; max-height: 44vh; overflow: auto;
+  background: rgba(20, 20, 40, .94);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--purple);
+  border-radius: 10px;
+  padding: .9em 1.1em;
+  font-size: 13px; line-height: 1.65; color: var(--text-mute);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .45);
+  backdrop-filter: blur(12px);
+}
+body.notes-on aside.notes::before {
+  content: "📝 Speaker Notes"; display: block;
+  font-size: 11px; font-weight: 800; letter-spacing: .08em;
+  color: var(--purple); margin-bottom: .4em;
+}
+
+/* HUD 进度条：章节分段刻度 */
+.chap-ticks {
+  position: fixed; left: 0; top: 0; width: 100%; height: 3px;
+  pointer-events: none; z-index: 22;
+}
+.chap-ticks .tick {
+  position: absolute; top: 0;
+  width: 1px; height: 100%;
+  background: rgba(255, 255, 255, .22);
+}
+.chap-ticks .tick.done { background: rgba(0, 214, 163, .55); }
+
+/* =========================================================
+   Print CSS · 导出 PDF 适配
+   ========================================================= */
+@media print {
+  @page { size: A4 landscape; margin: 0; }
+  html, body { background: #fff; color: #111; }
+  .bg-layer, .hud, .chapnav, .nav-btns, .zone, .help,
+  .overview, .chap-ticks, .progress { display: none !important; }
+  .deck { display: block; height: auto; }
+  .slide {
+    position: relative !important; display: block !important;
+    opacity: 1 !important; transform: none !important;
+    width: 100%; height: auto; min-height: 100vh;
+    page-break-after: always; break-after: page;
+    padding: 6vh 5vw;
+    color: #111; background: #fff;
+    box-shadow: none;
+  }
+  .slide .frag { opacity: 1 !important; transform: none !important; }
+  .slide .wrap { max-width: 100%; }
+  .kicker, .divider .d-sub, .dim, .dg-s { color: #444 !important; }
+  .hl, h1, h2, h3, .divider h2, .card-h { color: #111 !important; }
+  .card, .tbl, pre.code, .tech-diagram {
+    background: #fafafa !important; color: #111 !important;
+    border: 1px solid #ddd !important; box-shadow: none !important;
+  }
+  aside.notes { display: block !important;
+    position: static; max-height: none;
+    background: #fff8e6; border: 1px solid #e0c470; color: #444;
+    margin-top: 1em; font-size: 11px;
+  }
+  aside.notes::before { color: #a67900 !important; content: "📝 Speaker Notes:"; }
+  .big-flink, .big-n { color: #eee !important; }
 }

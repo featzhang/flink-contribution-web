@@ -38,6 +38,34 @@
     if (c && chapterFirst[c] === undefined) chapterFirst[c] = i;
   });
 
+  /* ---- HUD 进度条章节分段刻度 ---- */
+  function buildChapTicks() {
+    if (total <= 1) return;
+    const bar = document.createElement('div');
+    bar.className = 'chap-ticks';
+    bar.id = 'chapTicks';
+    document.body.appendChild(bar);
+    CHAPTERS.forEach((c) => {
+      const idx = chapterFirst[c.id];
+      if (idx === undefined || idx === 0) return;
+      const t = document.createElement('div');
+      t.className = 'tick';
+      t.dataset.chid = c.id;
+      t.dataset.idx = idx;
+      t.style.left = ((idx / (total - 1)) * 100) + '%';
+      t.title = '第 ' + c.id + ' 章 · ' + c.label;
+      bar.appendChild(t);
+    });
+  }
+  function updateChapTicks() {
+    const bar = document.getElementById('chapTicks');
+    if (!bar) return;
+    Array.from(bar.children).forEach((t) => {
+      const idx = parseInt(t.dataset.idx, 10);
+      t.classList.toggle('done', idx <= current);
+    });
+  }
+
   /* ---- 取当前页的 fragments ---- */
   function frags(idx) {
     return Array.from(slides[idx].querySelectorAll('.frag'))
@@ -63,6 +91,7 @@
 
     // 顶部章节条高亮
     renderChapnav();
+    updateChapTicks();
 
     location.hash = 'p' + (current + 1);
   }
@@ -147,6 +176,8 @@
       case 'End': e.preventDefault(); goTo(total - 1, true); break;
       case 'o': case 'O': toggleOverview(); break;
       case 'f': case 'F': toggleFullscreen(); break;
+      case 'n': case 'N': document.body.classList.toggle('notes-on'); break;
+      case 'p': case 'P': window.print(); break;
       case 'Escape': if (overview.classList.contains('open')) toggleOverview(); break;
     }
   });
@@ -200,6 +231,7 @@
 
   /* ---- 初始化（支持从 hash 恢复） ---- */
   buildChapnav();
+  buildChapTicks();
   buildOverview();
   const m = location.hash.match(/p(\d+)/);
   if (m) { const p = parseInt(m[1], 10) - 1; if (p >= 0 && p < total) current = p; }

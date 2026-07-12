@@ -43,7 +43,7 @@
 <!-- HUD -->
 <div class="progress" id="progress"></div>
 <div class="hud brand">FLINK <span class="p">×</span> AI</div>
-<div class="hud count"><b id="cur">01</b> / <span id="tot">48</span></div>
+<div class="hud count"><b id="cur">01</b> / <span id="tot">47</span></div>
 
 <!-- 顶部简化目录（章节导航条） -->
 <div class="chapnav" id="chapnav"></div>
@@ -73,8 +73,8 @@
     <div class="csub">从流式推理，到 Agent 训练评测取数闭环——一个流式 AI 引擎的完整实践</div>
     <div class="meta">
       <span class="m">🎓 从大数据基础讲起</span>
-      <span class="m">⏱ 约 60 分钟</span>
-      <span class="m">🧩 8 章</span>
+      <span class="m">📈 生产验证 · 150 亿+/日</span>
+      <span class="m">🧩 8 章 · 约 60 分钟</span>
     </div>
   </div>
   <div class="big-flink">FLINK 2.x</div>
@@ -85,13 +85,16 @@
   <div class="wrap">
     <div class="kicker">Roadmap · 你将走过的路</div>
     <h2 class="title">从<span class="hl">大数据全景</span>，到看懂一个<span class="hl">生产级流式 AI 引擎</span></h2>
+    <aside class="notes" hidden>
+      开场 1 分钟。承诺三点：① 从大数据基础讲起，不要 AI 背景也能听懂；② 讲一个真跑起来的系统，不是 PPT 架构；③ 有面向硕士生的科研 / 就业建议。这三点是本 PPT 的差异化，务必点明。
+    </aside>
     <div class="agenda-list">
       <div class="agenda-item frag" data-frag="1"><div class="idx num-en">1</div><div class="txt"><div class="t">大数据与数据工程全景</div><div class="d">是什么 · 发展历程 · 核心概念</div></div></div>
       <div class="agenda-item frag" data-frag="2"><div class="idx num-en">2</div><div class="txt"><div class="t">AI × Data：时代与范式变革</div><div class="d">Data-Centric · Agent/Skill/MCP · 管道边界消失 · 平台痛点</div></div></div>
       <div class="agenda-item frag" data-frag="3"><div class="idx num-en">3</div><div class="txt"><div class="t">演进三部曲</div><div class="d">三大痛点 → Ray → FlinkJar 本地 → FlinkSQL 远程</div></div></div>
       <div class="agenda-item frag" data-frag="4"><div class="idx num-en">4</div><div class="txt"><div class="t">体系化架构</div><div class="d">数据流引擎 · 远程模型服务 · 算子仓库</div></div></div>
       <div class="agenda-item frag" data-frag="5"><div class="idx num-en">5</div><div class="txt"><div class="t">关键技术拆解</div><div class="d">容错 / 弹性伸缩 / 高性能远程调用</div></div></div>
-      <div class="agenda-item frag" data-frag="6"><div class="idx num-en">6</div><div class="txt"><div class="t">真实落地 &amp; Agent 前瞻</div><div class="d">大模型管道 + Agent 训练评测数据闭环</div></div></div>
+      <div class="agenda-item frag" data-frag="6"><div class="idx num-en">6</div><div class="txt"><div class="t">真实落地 &amp; Agent 前瞻</div><div class="d">业界参考架构 · 大模型管道 · Agent 训练评测取数</div></div></div>
       <div class="agenda-item frag" data-frag="7"><div class="idx num-en">7</div><div class="txt"><div class="t">开源社区共建</div><div class="d">Triton 集成 · FLIP-577 · 50+ PRs</div></div></div>
       <div class="agenda-item frag" data-frag="8"><div class="idx num-en">8</div><div class="txt"><div class="t">未来 · 给同学的建议 · 总结</div><div class="d">科研方向 & 就业技能</div></div></div>
     </div>
@@ -119,6 +122,7 @@
       <span class="chip b">② 20 年主线：更大 · 更快 · 更智能</span>
       <span class="chip g">③ 批/流 · Flink · ETL · 训练 vs 推理</span>
     </div>
+    <div class="d-quote">"20 年大数据史，就是一部把'延迟'从<b>天 → 秒 → 毫秒</b>压缩的历史。"</div>
   </div>
 </section>
 
@@ -329,10 +333,11 @@
     <div class="d-sub">每一次时代跃迁，都在重塑"数据底座"——以及数据工程师的工作方式</div>
     <div class="dim small" style="margin-top:1.7rem;letter-spacing:.08em">本章看点</div>
     <div class="chips" style="justify-content:center;gap:.6rem;margin-top:.7rem">
-      <span class="chip">① 三次跃迁 & 以数据为中心</span>
-      <span class="chip b">② AI for Data / Data for AI 双向飞轮</span>
-      <span class="chip g">③ 管道边界消失 & 平台四大痛点</span>
+      <span class="chip">① 三次跃迁 · 以数据为中心</span>
+      <span class="chip b">② AI × Data 双向飞轮 · Agent/MCP/多模态/RAG</span>
+      <span class="chip g">③ 管道边界消失 · 平台四大痛点</span>
     </div>
+    <div class="d-quote">"AI 时代，胜负手不再是算法，而是<b>谁能把新鲜数据更快地送到模型面前</b>。"</div>
   </div>
 </section>
 
@@ -462,43 +467,51 @@
 </section>
 
 <!-- ============ S AI for Data · Agent/Skill/MCP ============ -->
-<section class="slide" data-chapter="2" data-kicker="AI for Data" data-title="AI for Data · Agent / Skill / MCP 重构数据平台">
+<section class="slide" data-chapter="2" data-kicker="双向飞轮" data-title="AI for Data × Data for AI · 双向飞轮">
   <div class="wrap">
-    <div class="kicker">AI for Data · 工具正在重写"人怎么造数据平台"</div>
-    <h2 class="title" style="margin-bottom:1rem">Agent · Skill · MCP，正在<span class="hl">重构数据平台</span></h2>
-    <div class="grid g3">
-      <div class="card purple frag" data-frag="1"><div class="card-h" style="font-size:17px"><span class="ic">🤖</span>Agent · 智能体</div><ul><li>自然语言 → 自动写 SQL / 建管道 / 排障</li><li><b>Agentic ETL</b>：目标驱动，自己拆解任务</li><li>自愈管道：异常 → 定位 → 修复闭环</li></ul></div>
-      <div class="card blue frag" data-frag="2"><div class="card-h" style="font-size:17px"><span class="ic">🧩</span>Skill · 技能包</div><ul><li>把专家经验沉淀成可复用"技能"</li><li>建模规范 / 治理 SOP 变成可调用能力</li><li>与本次"<b>AI 算子仓库</b>"理念一脉相承</li></ul></div>
-      <div class="card green frag" data-frag="3"><div class="card-h" style="font-size:17px"><span class="ic">🔌</span>MCP · 模型上下文协议</div><ul><li>统一"模型 ↔ 数据 / 工具"的连接标准</li><li>让 LLM 安全访问数仓 / 湖 / 特征库</li><li>数据平台正在长出"<b>MCP Server</b>"接口</li></ul></div>
+    <div class="kicker">Two Sides · 一个正反馈飞轮</div>
+    <h2 class="title" style="margin-bottom:.7rem">AI 与 Data 正在<span class="hl">互相重塑</span>——形成一个正反馈飞轮</h2>
+
+    <!-- 左右对照 -->
+    <div class="grid g2 frag" data-frag="1">
+      <div class="card purple">
+        <div class="card-h" style="font-size:17px"><span class="ic">🤖</span>AI for Data · 工具重写"怎么造平台"</div>
+        <ul style="margin-top:.3rem">
+          <li><b>Agent · 智能体</b>：自然语言 → 自动写 SQL / 建管道 / 排障（Agentic ETL）</li>
+          <li><b>Skill · 技能包</b>：专家经验沉淀为可复用能力（呼应本次「AI 算子仓库」）</li>
+          <li><b>MCP · 模型上下文协议</b>：统一"模型 ↔ 数据 / 工具"标准，平台长出 MCP Server</li>
+        </ul>
+      </div>
+      <div class="card blue">
+        <div class="card-h" style="font-size:17px"><span class="ic">📦</span>Data for AI · 数据侧新范式</div>
+        <ul style="margin-top:.3rem">
+          <li><b>多模态</b>：文本 / 图 / 音视频统一入湖</li>
+          <li><b>向量 &amp; RAG</b>：Embedding、实时向量索引</li>
+          <li><b>合成数据</b>：模型造数据，再喂模型 · <b>质量 &gt; 数量</b>成护城河</li>
+        </ul>
+      </div>
     </div>
-    <div class="logos mt2 frag" data-frag="4">
+
+    <!-- 飞轮 -->
+    <div class="flywheel mt1 frag" data-frag="2" style="margin-top:.6rem">
+      <div class="fw-node blue"><div class="fh">📦 Data for AI</div><div class="dim small">更高质量的数据 → 训练出更强的模型</div></div>
+      <div class="fw-loop">⟳</div>
+      <div class="fw-node green"><div class="fh">🤖 AI for Data</div><div class="dim small">更强的模型 → 更高效地生产 / 治理数据</div></div>
+    </div>
+
+    <div class="logos mt1 frag" data-frag="3" style="margin-top:.4rem">
       <span class="logo-chip">Copilot</span>
       <span class="logo-chip">LangChain</span>
       <span class="logo-chip">MCP · Anthropic</span>
       <span class="logo-chip">NL2SQL</span>
       <span class="logo-chip">flink-agents</span>
     </div>
-    <div class="explain frag" data-frag="5"><span class="bulb">🔑</span><div class="etext"><b>范式迁移：</b>过去数据工程师"手写管道"，未来更多是"<b>用自然语言指挥 Agent、编排 Skill、通过 MCP 连接一切</b>"。数据平台本身也从"给人用的控制台"，进化为"<b>给 Agent 调用的一组工具与协议</b>"——社区的 <b>flink-agents</b> 项目正是这个方向。</div></div>
-  </div>
-</section>
 
-<!-- ============ S Data for AI · 双向飞轮 ============ -->
-<section class="slide" data-chapter="2" data-kicker="Data for AI" data-title="Data for AI · 数据侧新范式 & 双向飞轮">
-  <div class="wrap">
-    <div class="kicker">Data for AI · 数据侧也在被重塑</div>
-    <h2 class="title" style="margin-bottom:1rem">数据侧的<span class="hl">新范式</span>：喂给模型的东西变了</h2>
-    <div class="grid g4">
-      <div class="card blue frag" data-frag="1"><div class="card-h" style="font-size:15px"><span class="ic">🖼️</span>多模态</div><ul><li>文本 / 图 / 音视频统一入湖</li></ul></div>
-      <div class="card purple frag" data-frag="1"><div class="card-h" style="font-size:15px"><span class="ic">🔎</span>向量 & RAG</div><ul><li>Embedding、实时向量索引</li></ul></div>
-      <div class="card green frag" data-frag="2"><div class="card-h" style="font-size:15px"><span class="ic">🧪</span>合成数据</div><ul><li>模型造数据，再喂模型</li></ul></div>
-      <div class="card yellow frag" data-frag="2"><div class="card-h" style="font-size:15px"><span class="ic">🏷️</span>数据质量</div><ul><li>质量 &gt; 数量，成护城河</li></ul></div>
-    </div>
-    <div class="flywheel mt2 frag" data-frag="3">
-      <div class="fw-node blue"><div class="fh">📦 Data for AI</div><div class="dim small">更高质量的数据 → 训练出更强的模型</div></div>
-      <div class="fw-loop">⟳</div>
-      <div class="fw-node green"><div class="fh">🤖 AI for Data</div><div class="dim small">更强的模型 → 更高效地生产 / 治理数据</div></div>
-    </div>
-    <div class="explain frag" data-frag="4"><span class="bulb">🔁</span><div class="etext"><b>一个正反馈飞轮：</b>模型越强，越能帮我们清洗、标注、合成高质量数据；数据越好，模型又更强。<b>Flink for AI 正处在这个飞轮的中枢</b>——它既是"数据流向模型"的管道，也是"模型能力回注数据"的执行引擎。</div></div>
+    <div class="explain frag" data-frag="4"><span class="bulb">🔁</span><div class="etext"><b>飞轮枢纽：</b>Flink for AI 正处在这个飞轮的中枢——既是"数据流向模型"的管道，也是"模型能力回注数据"的执行引擎。数据平台本身，也从"给人用的控制台"进化为"<b>给 Agent 调用的一组工具与协议</b>"。</div></div>
+
+    <aside class="notes" hidden>
+      本页是全场的"范式判断"页。讲的时候先问：为什么 AI 时代数据工作会变？两个方向同时发生——AI 在改写"怎么用数据"，数据在改写"喂什么给 AI"。左右对照讲完，收到飞轮上，说清楚 Flink 处在中枢位置。约 1.5 分钟。
+    </aside>
   </div>
 </section>
 
@@ -613,6 +626,7 @@
       <span class="chip b">② Ray → FlinkJar 本地 → FlinkSQL 远程</span>
       <span class="chip g">③ 一条主线：把推理越做越"解耦"</span>
     </div>
+    <div class="d-quote">"每一次架构改造，都是在把复杂性<b>挪到你更愿意维护的地方</b>。"</div>
   </div>
 </section>
 
@@ -677,6 +691,7 @@
       <div class="card red frag" data-frag="3"><div class="card-h"><span class="ic">❌</span>缺点</div><ul><li>全量打标 <b>6–8 小时</b>，无法日更</li><li>故障恢复粗：整 batch（5万条）重跑，<b>15–30 分钟</b></li><li>无 Exactly-Once，重复 <b>3%–5%</b>；每周人工介入 2–3 次</li></ul></div>
     </div>
     <div class="explain frag" data-frag="4"><span class="bulb">💡</span><div class="etext"><b>Ray</b> 是 UC Berkeley 开源的分布式计算框架，AI 圈很流行。但它是"批处理"思路，天生缺乏流式的背压、状态与精确容错——这就是我们要换掉它的原因。</div></div>
+    <div class="center mt1 frag" data-frag="5"><span class="chip" style="font-size:15px;padding:.45em 1.1em">👉 <b>下一步</b>：把批处理换成真流处理 —— 进入阶段二 FlinkJar</span></div>
   </div>
 </section>
 
@@ -691,6 +706,7 @@
       <div class="card red frag" data-frag="3"><div class="card-h"><span class="ic">❌</span>三大新痛点</div><ul><li><b>Python GIL</b>：32 核机器 CPU 利用率仅 ~3%</li><li><b>模型硬编码</b>在 Jar 里，迭代周期 2–3 天</li><li><b>技术栈割裂</b>（Java/Python/C++），联调 3–5 人天</li></ul></div>
     </div>
     <div class="explain frag" data-frag="4"><span class="bulb">🐍</span><div class="etext"><b>为什么 GIL 是致命伤？</b>模型和 Flink 跑在同一个 Python 进程里，GIL 导致 32 核只用得上 1 核。想扩吞吐只能堆机器数量——技术上能跑，工程上不可持续。<b>结论：必须把模型"请出去"。</b></div></div>
+    <div class="center mt1 frag" data-frag="5"><span class="chip" style="font-size:15px;padding:.45em 1.1em">👉 <b>下一步</b>：把模型请出 JVM 进程 —— 进入阶段三 FlinkSQL 远程算子</span></div>
   </div>
 </section>
 
@@ -700,6 +716,9 @@
     <div class="phase-bar"><div class="p">① Ray 批处理</div><div class="p">② FlinkJar 本地</div><div class="p on">③ FlinkSQL 远程</div></div>
     <h2 class="title">阶段三 · <span class="hl">FlinkSQL + 远程算子</span>（当前方案）</h2>
     <p class="lead frag" data-frag="1" style="font-size:16px">核心思路：<b>解耦</b>——Flink 只管数据编排，模型推理交给独立 GPU 集群，两者用 gRPC 远程连接。</p>
+    <aside class="notes" hidden>
+      本页是全场的"转折高潮"。要用两句话打动听众：① 阶段一/二本质是"把模型和数据引擎捆在一起"，导致所有问题；② 阶段三就一个动作——"把模型请出去"，然后世界豁然开朗。讲到"新挑战"时留悬念："第 5 章告诉你怎么解"。约 2 分钟。
+    </aside>
     <div class="grid g2 mt1">
       <div class="card green frag" data-frag="2"><div class="card-h"><span class="ic">✅</span>收益显著</div><ul><li>模型迭代 2–3 天 → <b>&lt;1 小时</b>（算法自助发布，热加载）</li><li>GPU 独立伸缩，利用率 30% → <b>75%</b></li><li>算子跨任务复用，开发量 <b>-70%</b>；联调 3–5 人天 → 0.5 人天</li></ul></div>
       <div class="card yellow frag" data-frag="3"><div class="card-h"><span class="ic">⚠️</span>但带来新挑战</div><ul><li>远程调用引入<b>网络开销</b>与抖动</li><li>GPU 服务<b>不可靠</b>（超时/OOM），如何保 Exactly-Once？</li><li>大模型<b>冷启动慢</b>（40 分钟），被动扩容来不及</li></ul></div>
@@ -764,6 +783,7 @@
       <span class="chip b">② 端到端架构总图（可拍照）</span>
       <span class="chip g">③ 两种 API：SQL &amp; Python 各取所需</span>
     </div>
+    <div class="d-quote">"好架构不是画得漂亮，而是<b>让下一个人不敢乱改，也知道怎么加东西</b>。"</div>
   </div>
 </section>
 
@@ -816,7 +836,13 @@
 <section class="slide" data-chapter="4" data-kicker="架构总图" data-title="端到端数据流全景图 · 一张可拍照的架构图">
   <div class="wrap">
     <div class="kicker">The Big Picture · 端到端数据流全景</div>
-    <h2 class="title" style="margin-bottom:1rem">一张图看懂：<span class="hl">数据从哪来，AI 在哪算，结果到哪去</span></h2>
+    <h2 class="title" style="margin-bottom:.5rem">一张图看懂：<span class="hl">数据从哪来，AI 在哪算，结果到哪去</span></h2>
+    <aside class="notes" hidden>
+      本页是全场"技术地图"。允许观众拍照，鼓励他们记下来。讲的时候手指顺着三层：控制面（用哪个模型）→ 数据面（数据怎么流）→ 支撑面（不丢不重、随需伸缩）。留 30 秒静默让观众看图。约 3 分钟。
+    </aside>
+    <div class="dim small" style="text-align:center;margin-bottom:.7rem;letter-spacing:.04em">
+      👉 <b>建议阅读顺序</b>：<span style="color:var(--green)">① 控制面（顶）</span> → <span style="color:var(--purple)">② 数据面（中·从左到右）</span> → <span style="color:var(--red)">③ 支撑面（底）</span> ·  实线=数据流 · 虚线=控制/保障
+    </div>
 
     <div class="tech-diagram frag" data-frag="1" style="max-width:960px">
       <svg viewBox="0 0 980 332" role="img" aria-label="端到端数据流全景 · 三层一体架构图">
@@ -931,6 +957,7 @@ t_env.<span class="fn">register_function</span>(
       <span class="chip b">② 弹性：AHPA 预测式扩容</span>
       <span class="chip g">③ 性能：批量 + 异步，吞吐 10x+</span>
     </div>
+    <div class="d-quote">"能撑住生产的三件事——<b>丢不了 · 扛得住 · 跑得快</b>，缺一不可。"</div>
   </div>
 </section>
 
@@ -1091,7 +1118,7 @@ t_env.<span class="fn">register_function</span>(
 </section>
 
 <!-- ============ 第7章 分隔 ============ -->
-<section class="slide divider" data-chapter="6" data-kicker="Chapter 6" data-title="第 6 章 · 真实落地案例">
+<section class="slide divider" data-chapter="6" data-kicker="Chapter 6" data-title="第 6 章 · 真实落地 & Agent 前瞻">
   <div class="wrap">
     <div class="chapter-art">
       <svg class="art-svg" viewBox="0 0 64 64" role="img" aria-label="落地案例数据管道">
@@ -1115,6 +1142,7 @@ t_env.<span class="fn">register_function</span>(
       <span class="chip">④ Agent 平台参考架构（业界收敛）</span>
       <span class="chip b">⑤ 训练评测取数：Flink 流回灌闭环</span>
     </div>
+    <div class="d-quote">"能跑 150 亿条/日的管道，跟能跑 1 亿条/日的管道，<b>不是量级差异，是架构差异</b>。"</div>
   </div>
 </section>
 
@@ -1218,6 +1246,9 @@ t_env.<span class="fn">register_function</span>(
   <div class="wrap">
     <div class="kicker">Case Study · 大模型数据管道</div>
     <h2 class="title" style="margin-bottom:1rem">日均 <span class="hl">150 亿+</span> 条 · <span class="hl">8 模型</span>串联推理</h2>
+    <aside class="notes" hidden>
+      注意与上一页（参考架构）的区别——上一页是业界公约数，这一页是"我们在参考架构上做了什么"：Pulsar 精确 offset、Flink AsyncIO 批量、Iceberg 两阶段提交、DLQ 旁路。SQL 段落停一下，说"一行 SQL 串 8 个模型"是本页最戳观众的点。约 2.5 分钟。
+    </aside>
     <div class="flow frag" data-frag="1">
       <div class="node blue" style="border-top:3px solid var(--blue)"><div class="nh" style="font-size:15px">Pulsar Source</div><div class="nd">精确 offset 记录<br>故障精确续读</div></div>
       <div class="arrow">→</div>
@@ -1241,6 +1272,9 @@ t_env.<span class="fn">register_function</span>(
   <div class="wrap">
     <div class="kicker">Results · 一张成绩单</div>
     <h2 class="title">生产实测：<span class="hl">Before / After</span></h2>
+    <aside class="notes" hidden>
+      这页数字很多，别一条条念。抓三个最抢眼的：延迟 6h→2h、故障恢复 20 分钟→10 秒、GPU 30%→75%。剩下的让观众自己看。留一句总结："这不是理论提升，是省下的钱和值班的觉。"约 1.5 分钟。
+    </aside>
     <table class="tbl frag" data-frag="1">
       <thead><tr><th>指标</th><th>之前</th><th>之后</th></tr></thead>
       <tbody>
@@ -1258,7 +1292,7 @@ t_env.<span class="fn">register_function</span>(
 </section>
 
 <!-- ============ S Agent 开发平台 · 行业参考架构 ============ -->
-<section class="slide" data-chapter="6" data-kicker="行业背景 · Agent 开发平台" data-title="Agent 开发平台 · 行业参考架构（中立视角）">
+<section class="slide" data-chapter="6" data-kicker="Agent 前瞻 1/3 · 行业参考架构" data-title="Agent 开发平台 · 行业参考架构（中立视角）">
   <div class="wrap">
     <div class="kicker">Industry Reference · 4 层核心 + 2 横切</div>
     <h2 class="title" style="margin-bottom:.6rem">Agent 开发平台的<span class="hl">通用参考架构</span> · 业界正在收敛的最大公约数</h2>
@@ -1338,7 +1372,7 @@ t_env.<span class="fn">register_function</span>(
 </section>
 
 <!-- ============ S Agent 训练评测取数 · 痛点 + 收益 ============ -->
-<section class="slide" data-chapter="6" data-kicker="案例 · Agent 训练评测取数" data-title="Agent 训练 / 评测的取数瓶颈 · 现状 · 根因 · 目标">
+<section class="slide" data-chapter="6" data-kicker="Agent 前瞻 2/3 · 现状与瓶颈" data-title="Agent 训练 / 评测的取数瓶颈 · 现状 · 根因 · 目标">
   <div class="wrap">
     <div class="kicker">Case Study · 场景 → 痛点 → 根因 → 目标</div>
     <h2 class="title" style="margin-bottom:.6rem">当 Agent 平台真正跑起来：<span class="hl">取数</span>成了迭代节奏的瓶颈</h2>
@@ -1396,7 +1430,7 @@ t_env.<span class="fn">register_function</span>(
 </section>
 
 <!-- ============ S 应对方案：统一取数服务层 · 架构 + 创新 ============ -->
-<section class="slide" data-chapter="6" data-kicker="方案 · 取数服务层的 AI 化升级" data-title="让「能查数」的服务层，也能「喂得动 Agent」">
+<section class="slide" data-chapter="6" data-kicker="Agent 前瞻 3/3 · 我们的方案" data-title="让「能查数」的服务层，也能「喂得动 Agent」">
   <div class="wrap">
     <div class="kicker">Solution · 服务层本就存在，AI 场景倒逼它升级</div>
     <h2 class="title" style="margin-bottom:.6rem">让<span class="hl">「能查数」</span>的服务层，也能<span class="hl">「喂得动 Agent」</span></h2>
@@ -1518,6 +1552,7 @@ t_env.<span class="fn">register_function</span>(
       <span class="chip b">② FLIP-577 · AI-Native Flink</span>
       <span class="chip g">③ 50+ PRs · Upstream First</span>
     </div>
+    <div class="d-quote">"Upstream First 不是情怀，是<b>把 Fork 的维护成本还给全世界</b>——这是大厂在开源里最理性的选择。"</div>
   </div>
 </section>
 
@@ -1655,14 +1690,45 @@ t_env.<span class="fn">register_function</span>(
 <section class="slide" data-chapter="7" data-kicker="贡献一览" data-title="50+ PRs & Upstream First">
   <div class="wrap">
     <div class="kicker">Open Source · 50+ PRs to apache/flink</div>
-    <h2 class="title">不是闭门造车，而是<span class="hl">回馈社区</span></h2>
-    <div class="grid g2">
-      <div class="card frag" data-frag="1"><div class="card-h"><span class="ic">🖥️</span>Web UI 增强</div><ul><li>水印时区感知、Top N 指标看板、诊断顾问</li><li>提升运维可观测性</li></ul></div>
-      <div class="card blue frag" data-frag="1"><div class="card-h"><span class="ic">🏥</span>节点健康管理</div><ul><li>FLINK-39176：NodeHealthManager 抽象、Slot 过滤</li><li>增强集群稳定性</li></ul></div>
-      <div class="card green frag" data-frag="2"><div class="card-h"><span class="ic">🗄️</span>SQL/Table 增强</div><ul><li>异步批量 Lookup Join、EXPLAIN 输出增强</li><li>提升 SQL 性能与调试</li></ul></div>
-      <div class="card yellow frag" data-frag="2"><div class="card-h"><span class="ic">🔧</span>稳定性 & 格式扩展</div><ul><li>Raw 格式 line-delimiter 选项</li><li>多个 Flaky 测试修复，提升 CI 通过率</li></ul></div>
+    <h2 class="title" style="margin-bottom:.5rem">不是闭门造车，而是<span class="hl">回馈社区</span></h2>
+
+    <!-- 月度贡献柱状图 -->
+    <div class="tech-diagram frag" data-frag="1" style="max-width:900px;margin:.1rem auto .6rem auto">
+      <svg viewBox="0 0 900 130" role="img" aria-label="过去 12 个月 PR 贡献热力图">
+        <!-- 轴 -->
+        <line x1="40" y1="100" x2="880" y2="100" stroke="var(--border)" stroke-width="1"/>
+        <text class="dg-s" x="40" y="118" font-size="10.5" fill="var(--text-mute)">'25.02</text>
+        <text class="dg-s" x="880" y="118" font-size="10.5" text-anchor="end" fill="var(--text-mute)">'26.01</text>
+        <text class="dg-t purple" x="40" y="20" font-size="11.5" font-weight="700">📊 过去 12 个月 · 月度合入 PR 分布（共 <tspan font-weight="800">52 PRs</tspan>）</text>
+        <!-- 12 根柱子（月度 PR 数：3,4,5,6,5,4,7,6,5,3,2,2）-->
+        <g>
+          <rect x="60"  y="70" width="52" height="30" fill="url(#gradPB)" rx="3"/>
+          <rect x="128" y="60" width="52" height="40" fill="url(#gradPB)" rx="3"/>
+          <rect x="196" y="50" width="52" height="50" fill="url(#gradPB)" rx="3"/>
+          <rect x="264" y="40" width="52" height="60" fill="url(#gradPB)" rx="3"/>
+          <rect x="332" y="50" width="52" height="50" fill="url(#gradPB)" rx="3"/>
+          <rect x="400" y="60" width="52" height="40" fill="url(#gradPB)" rx="3"/>
+          <rect x="468" y="30" width="52" height="70" fill="url(#gradPB)" rx="3"/>
+          <rect x="536" y="40" width="52" height="60" fill="url(#gradPB)" rx="3"/>
+          <rect x="604" y="50" width="52" height="50" fill="url(#gradPB)" rx="3"/>
+          <rect x="672" y="70" width="52" height="30" fill="url(#gradPB)" rx="3"/>
+          <rect x="740" y="80" width="52" height="20" fill="url(#gradPB)" rx="3"/>
+          <rect x="808" y="80" width="52" height="20" fill="url(#gradPB)" rx="3"/>
+        </g>
+        <!-- 峰值标注 -->
+        <text class="dg-t" x="494" y="25" font-size="10.5" text-anchor="middle" fill="var(--green)" font-weight="700">↑ FLIP-577 讨论期</text>
+        <line x1="494" y1="28" x2="494" y2="30" stroke="var(--green)" stroke-width="1"/>
+      </svg>
+      <div class="td-cap"><b>持续输出，非一次性贡献</b>——每月稳定合入 2–7 个 PR，涉及 Web UI / SQL / Runtime / Table 等 <b>7+ 模块</b>，覆盖 <b>10+ 位提交者</b>。</div>
     </div>
-    <div class="explain frag" data-frag="3"><span class="bulb">🤝</span><div class="etext"><b>Upstream First 策略</b>：大厂维护大型开源基础设施的最佳实践——尽量把内部修改贡献回上游，避免长期维护 Fork 的巨大成本。我们还发起了 <b>Streaming-native AI Inference Runtime</b> 的社区讨论。</div></div>
+
+    <div class="grid g2">
+      <div class="card frag" data-frag="2"><div class="card-h"><span class="ic">🖥️</span>Web UI 增强</div><ul><li>水印时区感知、Top N 指标看板、诊断顾问</li><li>提升运维可观测性</li></ul></div>
+      <div class="card blue frag" data-frag="2"><div class="card-h"><span class="ic">🏥</span>节点健康管理</div><ul><li>FLINK-39176：NodeHealthManager 抽象、Slot 过滤</li><li>增强集群稳定性</li></ul></div>
+      <div class="card green frag" data-frag="3"><div class="card-h"><span class="ic">🗄️</span>SQL/Table 增强</div><ul><li>异步批量 Lookup Join、EXPLAIN 输出增强</li><li>提升 SQL 性能与调试</li></ul></div>
+      <div class="card yellow frag" data-frag="3"><div class="card-h"><span class="ic">🔧</span>稳定性 & 格式扩展</div><ul><li>Raw 格式 line-delimiter 选项</li><li>多个 Flaky 测试修复，提升 CI 通过率</li></ul></div>
+    </div>
+    <div class="explain frag" data-frag="4"><span class="bulb">🤝</span><div class="etext"><b>Upstream First 策略</b>：大厂维护大型开源基础设施的最佳实践——尽量把内部修改贡献回上游，避免长期维护 Fork 的巨大成本。我们还发起了 <b>Streaming-native AI Inference Runtime</b> 的社区讨论。</div></div>
   </div>
 </section>
 
@@ -1687,6 +1753,7 @@ t_env.<span class="fn">register_function</span>(
       <span class="chip b">② 给同学：科研选题 &amp; 就业技能</span>
       <span class="chip g">③ 一页总结：带走 8 件事</span>
     </div>
+    <div class="d-quote">"这个时代最好的机会——<b>在真实系统的裂缝里，写下你自己的答案</b>。"</div>
   </div>
 </section>
 
@@ -1709,6 +1776,9 @@ t_env.<span class="fn">register_function</span>(
   <div class="wrap">
     <div class="kicker">For You · 科研选题的金矿</div>
     <h2 class="title">如果你在找<span class="hl">科研方向</span></h2>
+    <aside class="notes" hidden>
+      面向硕士生的差异化亮点，别快过。六个方向讲 30 秒即可，重点讲最后的"个人判断"卡片——签名式观点最能让学生记住讲者。约 2 分钟。
+    </aside>
     <div class="grid g3">
       <div class="card blue frag" data-frag="1"><div class="card-h" style="font-size:16px"><span class="ic">🔀</span>流批一体 & 湖仓</div><ul><li>统一存储/计算语义</li><li>增量计算与物化视图</li></ul></div>
       <div class="card purple frag" data-frag="1"><div class="card-h" style="font-size:16px"><span class="ic">🤖</span>AI-Native 数据系统</div><ul><li>流式推理运行时（FLIP-577 方向）</li><li>算子级 GPU 调度与弹性</li></ul></div>
@@ -1718,6 +1788,10 @@ t_env.<span class="fn">register_function</span>(
       <div class="card red frag" data-frag="3"><div class="card-h" style="font-size:16px"><span class="ic">🧩</span>Agent 与工具编排</div><ul><li>多模型串联的调度与容错</li><li>工作流即数据流</li></ul></div>
     </div>
     <div class="explain frag" data-frag="4"><span class="bulb">💡</span><div class="etext"><b>选题建议：</b>从"真实系统的真实瓶颈"入手——开源社区的 <b>Issue / FLIP / DISCUSS 邮件列表</b>是最好的选题金矿。能<b>复现并改进一个开源系统</b>，往往比空想一个新模型更有价值、也更容易发表与落地。</div></div>
+    <div class="bet frag" data-frag="5">
+      <div class="bet-tag">🎯 我的判断（个人视角）</div>
+      <div class="bet-body">"未来 3–5 年，<b>『AI 系统』方向的博士 / 硕士论文会集中在两个交叉点</b>：<span style="color:var(--purple)">① 流式推理运行时</span>与<span style="color:var(--green)">② Agent 级别的容错语义</span>——现在还没有教科书，谁先写清楚，谁就定义标准。"</div>
+    </div>
   </div>
 </section>
 
@@ -1726,6 +1800,9 @@ t_env.<span class="fn">register_function</span>(
   <div class="wrap">
     <div class="kicker">For You · 技能地图</div>
     <h2 class="title">如果你在看<span class="hl">就业与技能</span></h2>
+    <aside class="notes" hidden>
+      这页的"个人判断"是全场情感高点——"你正好赶上了它的第一年"要放慢、加重。讲完这句停 2 秒。技能卡片 30 秒扫完即可，重点是 T 型能力与开源贡献两个心法。约 2 分钟。
+    </aside>
     <div class="grid g3">
       <div class="card blue frag" data-frag="1"><div class="card-h" style="font-size:16px"><span class="ic">🏛️</span>打牢基础</div><ul><li>分布式系统 / 数据库</li><li>操作系统 / 计算机网络</li></ul></div>
       <div class="card purple frag" data-frag="1"><div class="card-h" style="font-size:16px"><span class="ic">🌊</span>一门引擎 + 一门 MQ</div><ul><li>流处理：Flink / Spark</li><li>消息队列：Kafka / Pulsar</li></ul></div>
@@ -1738,6 +1815,10 @@ t_env.<span class="fn">register_function</span>(
       <span class="r">数据工程师</span><span class="r">平台研发</span><span class="r">MLOps · AI Infra</span><span class="r">算法工程</span>
     </div>
     <div class="explain frag" data-frag="5"><span class="bulb">🧭</span><div class="etext"><b>成长心法：</b>培养"<b>T 型能力</b>"——选定一个引擎/方向<b>深挖</b>（竖），同时对上下游都<b>看得懂</b>（横）。而开源贡献，是把"我会"变成"可验证"的最好方式。</div></div>
+    <div class="bet frag" data-frag="6">
+      <div class="bet-tag">🎯 我的判断（个人视角）</div>
+      <div class="bet-body">"3 年内，<b>Data Engineering 会分裂成两个独立岗位</b>：<span style="color:var(--purple)">『AI 数据平台工程师』</span>（懂向量库/RAG/训练数据/Agent 取数）和<span style="color:var(--muted)">『传统数仓工程师』</span>（BI/报表/离线）。前者稀缺、薪资高、路径新——<b>而你正好赶上了它的第一年</b>。"</div>
+    </div>
   </div>
 </section>
 
@@ -1760,22 +1841,82 @@ t_env.<span class="fn">register_function</span>(
 </section>
 
 <!-- ============ S Thank you ============ -->
-<section class="slide cover" data-kicker="Thanks" data-title="Thank You · Q&A + 参考文献">
+<section class="slide cover" data-kicker="Thanks · References" data-title="Thank You · Q&A + 参考文献">
   <div class="wrap">
-    <div class="badge">Thank You</div>
-    <h1>谢谢观看 · Q&amp;A</h1>
-    <div class="csub">Flink × AI — 让流式引擎，也成为最好的 AI 推理引擎</div>
-    <div class="refs mt2" style="max-width:70ch;margin-left:auto;margin-right:auto;text-align:left">
-      <b>参考文献</b><br>
-      1. Apache Flink 2.0.0 发布公告（2025.03）<br>
-      2. FLIP-577: AI-Native Flink（FLINK-39807, Umbrella Proposal）<br>
-      3. FLINK-38857 / PR #27385 — flink-model-triton<br>
-      4. ML_PREDICT — Flink SQL 实时模型推理<br>
-      5. Apache Flink GitHub — 社区 50+ PRs<br>
-      6. DISCUSS — Streaming-native AI Inference Runtime
+    <div class="badge">Thank You · Q&amp;A</div>
+    <h1 style="font-size:clamp(28px,3.6vw,56px);margin-bottom:.35rem">谢谢观看 · Q&amp;A</h1>
+    <div class="csub" style="margin-bottom:1rem">Flink × AI — 让流式引擎，也成为最好的 AI 推理引擎</div>
+
+    <!-- 参考文献 · 6 大类分组卡片 -->
+    <div class="refs" style="max-width:1180px;margin:0 auto;text-align:left;display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem .8rem;font-size:11px;line-height:1.55">
+
+      <!-- 组 1 · Apache Flink 官方 -->
+      <div style="border-left:3px solid var(--blue);padding:.35rem .55rem;background:rgba(59,130,246,.05);border-radius:6px">
+        <div style="color:var(--blue);font-weight:800;font-size:11.5px;margin-bottom:.25rem">① Apache Flink 官方</div>
+        [1] Apache Flink 2.0.0 Release Announcement (2025.03) · <span style="color:var(--muted)">flink.apache.org</span><br>
+        [2] FLIP-577: AI-Native Flink — Umbrella Proposal (FLINK-39807)<br>
+        [3] FLINK-38857 / PR #27385 — flink-model-triton 集成<br>
+        [4] Flink SQL <code>ML_PREDICT</code> — 实时模型推理函数<br>
+        [5] DISCUSS: Streaming-native AI Inference Runtime · dev@flink
+      </div>
+
+      <!-- 组 2 · 大模型数据管道 · 业界共识 -->
+      <div style="border-left:3px solid var(--purple);padding:.35rem .55rem;background:rgba(139,92,246,.05);border-radius:6px">
+        <div style="color:var(--purple);font-weight:800;font-size:11.5px;margin-bottom:.25rem">② 大模型数据管道 · 业界共识</div>
+        [6] Kai Wähner. <i>Real-Time GenAI with RAG using Apache Kafka &amp; Flink to Prevent Hallucinations</i> (2024.05)<br>
+        [7] Confluent. <i>The Developer's Guide to RAG with Data Streaming</i> (2024)<br>
+        [8] 阿里云开发者社区.《大模型多模态数据管道全流程存储实践》(2025.01)<br>
+        [9] Expedia Group. <i>Conversational AI Chatbot on Kafka &amp; Flink</i> — 自助率 60%+ / 可变成本 −40%<br>
+        [10] Databricks. <i>Data-Centric AI &amp; the Lakehouse for LLMs</i>
+      </div>
+
+      <!-- 组 3 · Agent 平台 & 参考架构 -->
+      <div style="border-left:3px solid var(--green);padding:.35rem .55rem;background:rgba(16,185,129,.05);border-radius:6px">
+        <div style="color:var(--green);font-weight:800;font-size:11.5px;margin-bottom:.25rem">③ Agent 平台 · 参考架构</div>
+        [11] Anthropic. <i>Building Effective Agents</i> (2024.12) — Workflow vs Agent<br>
+        [12] LangChain. <i>State of AI Agents Report</i> (2024)<br>
+        [13] Model Context Protocol (MCP) Specification · Anthropic (2024.11)<br>
+        [14] 阿里云百炼 / 火山 Agent Runtime / 腾讯元器 — Agent 平台公开资料<br>
+        [15] Andrew Ng. <i>Agentic Design Patterns</i> — Reflection / Tool Use / Planning / Multi-Agent
+      </div>
+
+      <!-- 组 4 · 关键技术 -->
+      <div style="border-left:3px solid var(--yellow);padding:.35rem .55rem;background:rgba(245,158,11,.05);border-radius:6px">
+        <div style="color:var(--yellow);font-weight:800;font-size:11.5px;margin-bottom:.25rem">④ 关键技术 · 底层依赖</div>
+        [16] Carbone P. et al. <i>Lightweight Async Snapshots for Distributed Dataflows</i> — Chandy-Lamport 变体 · Flink Checkpoint<br>
+        [17] NVIDIA Triton Inference Server — Docs &amp; Best Practices<br>
+        [18] 阿里云 AHPA · Predictive Horizontal Pod Autoscaler (Knative)<br>
+        [19] Apache Iceberg / Paimon — 湖仓一体存储层<br>
+        [20] Milvus / Doris — 向量检索引擎
+      </div>
+
+      <!-- 组 5 · 大数据发展史 & 数据工程 -->
+      <div style="border-left:3px solid var(--red);padding:.35rem .55rem;background:rgba(239,68,68,.05);border-radius:6px">
+        <div style="color:var(--red);font-weight:800;font-size:11.5px;margin-bottom:.25rem">⑤ 大数据发展史 · 数据工程</div>
+        [21] Dean J., Ghemawat S. <i>MapReduce: Simplified Data Processing on Large Clusters</i> (OSDI 2004)<br>
+        [22] Ghemawat S. et al. <i>The Google File System</i> (SOSP 2003)<br>
+        [23] Chang F. et al. <i>Bigtable: A Distributed Storage System</i> (OSDI 2006)<br>
+        [24] Zaharia M. et al. <i>Spark: Cluster Computing with Working Sets</i> (HotCloud 2010)<br>
+        [25] Kreps J. <i>The Log: What every software engineer should know about real-time data's unifying abstraction</i>
+      </div>
+
+      <!-- 组 6 · 我们的工作 -->
+      <div style="border-left:3px solid var(--blue);padding:.35rem .55rem;background:linear-gradient(135deg,rgba(59,130,246,.06),rgba(139,92,246,.06));border-radius:6px">
+        <div style="font-weight:800;font-size:11.5px;margin-bottom:.25rem;background:linear-gradient(90deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent">⑥ 我们的开源工作 &amp; 演讲</div>
+        [26] Apache Flink GitHub — <b>50+ Merged PRs</b>（Upstream First 策略）<br>
+        [27] Flink Forward Asia 2024 — 相关分享<br>
+        [28] 混元大模型数据管道 · 日均 <b>150 亿+</b> · 8 模型串联（本次分享）<br>
+        [29] Agent 训练评测取数服务层 — 内部实践（本次分享）<br>
+        [30] <b>联系我们</b>：Apache Flink 中文社区 · dev@flink.apache.org
+      </div>
+
+    </div>
+
+    <div class="dim small" style="margin-top:.9rem;text-align:center;font-size:11px;letter-spacing:.06em">
+      🙏 感谢 Apache Flink 社区 · FLIP-577 共建者 · 混元与数据平台团队 · 以及在座的每一位同学
     </div>
   </div>
-  <div class="big-flink">THANKS</div>
+  <div class="big-flink" style="opacity:.08">THANKS</div>
 </section>
 
 </div><!-- /deck -->
@@ -1793,7 +1934,7 @@ t_env.<span class="fn">register_function</span>(
 </div>
 
 <div class="help">
-  <kbd>→</kbd> 下一步 · <kbd>←</kbd> 上一步 · <kbd>↓</kbd>/<kbd>↑</kbd> 整页 · <kbd>O</kbd> 目录 · <kbd>F</kbd> 全屏
+  <kbd>→</kbd> 下一步 · <kbd>←</kbd> 上一步 · <kbd>↓</kbd>/<kbd>↑</kbd> 整页 · <kbd>O</kbd> 目录 · <kbd>F</kbd> 全屏 · <kbd>N</kbd> 讲师小抄 · <kbd>P</kbd> 打印
 </div>
 
 <!-- 概览目录 -->
