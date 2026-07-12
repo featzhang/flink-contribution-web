@@ -114,6 +114,100 @@
       .sort((a, b) => (+ (a.dataset.frag || 0)) - (+ (b.dataset.frag || 0)));
   }
 
+  /* =========================================================
+     架构图进场动画 · Diagram Auto-Reveal
+     - 初始化时给每个 .tech-diagram 内 SVG 元素分组打标：
+         rect  → .dg-anim.dg-anim-box   (第 1 波：先出盒子)
+         text  → .dg-anim.dg-anim-txt   (第 2 波：文字上浮)
+         line/path/polyline/polygon → .dg-anim.dg-anim-line (第 3 波：绘制连线)
+     - 每类元素内按 DOM 顺序赋 --i，形成 stagger
+     - 切换到该 slide 时给 .tech-diagram 补 .dg-play 触发动画
+       （切走再切回可重播）
+     ========================================================= */
+  function initDiagramAnim() {
+    const diagrams = document.querySelectorAll('.tech-diagram');
+    diagrams.forEach((td) => {
+      const svg = td.querySelector('svg');
+      if (!svg) return;
+      // 三组元素分别打标 + stagger 序号
+      const groups = [
+        { sel: 'rect', cls: 'dg-anim-box',  base: 0,  step: 1 },
+        { sel: 'text,tspan', cls: 'dg-anim-txt', base: 3,  step: 1 },
+        { sel: 'line,path,polyline,polygon', cls: 'dg-anim-line', base: 6, step: 1 }
+      ];
+      groups.forEach(({ sel, cls, base, step }) => {
+        const nodes = svg.querySelectorAll(sel);
+        nodes.forEach((el, i) => {
+          // tspan 单独动会跟父 text 冲突，跳过
+          if (el.tagName.toLowerCase() === 'tspan') return;
+          el.classList.add('dg-anim', cls);
+          el.style.setProperty('--i', String(base + i * step));
+
+          // 为 line/path 计算长度，做"绘制"动画
+          if (cls === 'dg-anim-line' && typeof el.getTotalLength === 'function') {
+            try {
+              const len = el.getTotalLength();
+              if (len > 0 && len < 5000) {
+                el.style.setProperty('--dg-len', len.toFixed(1));
+              }
+            } catch (_) { /* getTotalLength 在某些元素上会抛错，忽略 */ }
+          }
+        });
+      });
+    });
+  }
+
+  function playDiagramAnim(slide) {
+    if (!slide) return;
+    const diagrams = slide.querySelectorAll('.tech-diagram');
+    if (!diagrams.length) return;
+
+    diagrams.forEach((td) => {
+      // 判断该架构图当前是否"可见"：本身不是 .frag，或者已 .shown
+      const isFrag = td.classList.contains('frag');
+      const visible = !isFrag || td.classList.contains('shown');
+
+      if (!visible) {
+        // 还没揭示 → 复位，等下次 render 时再触发
+        td.classList.remove('dg-play', 'dg-done');
+        if (td._dgTimer) { clearTimeout(td._dgTimer); td._dgTimer = null; }
+        return;
+      }
+      // 若已经在播且未完成，不重复触发；若已完成，也不重播（避免 fragStep 前进导致的抖动）
+      if (td.classList.contains('dg-play')) return;
+
+      // 触发一次：先复位类，再下一帧加 dg-play（强制 transition 重启）
+      td.classList.remove('dg-done');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          td.classList.add('dg-play');
+          // 估算最长延迟：最大 --i * 55ms + 单条最长 duration 800ms + 缓冲
+          const anims = td.querySelectorAll('.dg-anim');
+          let maxI = 0;
+          anims.forEach((el) => {
+            const v = parseInt(el.style.getPropertyValue('--i'), 10);
+            if (!isNaN(v) && v > maxI) maxI = v;
+          });
+          const total = maxI * 55 + 800 + 100;
+          if (td._dgTimer) clearTimeout(td._dgTimer);
+          td._dgTimer = setTimeout(() => {
+            td.classList.add('dg-done');
+            td._dgTimer = null;
+          }, total);
+        });
+      });
+    });
+  }
+
+  /* 切走该 slide 时复位其架构图动画状态，以便下次切回可重播 */
+  function resetDiagramAnim(slide) {
+    if (!slide) return;
+    slide.querySelectorAll('.tech-diagram').forEach((td) => {
+      td.classList.remove('dg-play', 'dg-done');
+      if (td._dgTimer) { clearTimeout(td._dgTimer); td._dgTimer = null; }
+    });
+  }
+
   /* ---- 单页内容溢出兜底：如果 wrap 高度超过可视区，二次缩小 ---- */
   function fitCurrentSlide() {
     if (isResponsiveFallback()) return;
@@ -144,12 +238,19 @@
   }
 
   /* ---- 渲染当前页状态 ---- */
+  let lastActiveIdx = -1;
   function render() {
     slides.forEach((s, i) => {
       s.classList.remove('active', 'past');
       if (i === current) s.classList.add('active');
       else if (i < current) s.classList.add('past');
     });
+
+    // 切页时复位上一页的架构图动画状态，便于返回时重播
+    if (lastActiveIdx !== current && lastActiveIdx >= 0) {
+      resetDiagramAnim(slides[lastActiveIdx]);
+    }
+    lastActiveIdx = current;
 
     // fragment 揭示
     const fs = frags(current);
@@ -166,6 +267,9 @@
 
     // 内容溢出兜底
     fitCurrentSlide();
+
+    // 架构图进场动画（每次切到该页都重播一次）
+    playDiagramAnim(slides[current]);
 
     location.hash = 'p' + (current + 1);
   }
@@ -307,6 +411,7 @@
   buildChapnav();
   buildChapTicks();
   buildOverview();
+  initDiagramAnim();
   const m = location.hash.match(/p(\d+)/);
   if (m) { const p = parseInt(m[1], 10) - 1; if (p >= 0 && p < total) current = p; }
   fragStep = 0;
