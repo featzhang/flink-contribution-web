@@ -435,7 +435,7 @@
 </section>
 
 <!-- ============ S AI 对软件工程 & 数据工程的变化 ============ -->
-<section class="slide" data-chapter="2" data-kicker="范式变化" data-title="AI 对软件工程 & 数据工程的变化">
+<section class="slide" data-chapter="2" data-kicker="范式变化 · 选讲" data-title="AI 对软件工程 & 数据工程的变化">
   <div class="wrap">
     <div class="kicker">Paradigm Shift · AI 带来了什么</div>
     <h2 class="title">AI 正在重写<span class="hl">软件工程</span>与<span class="hl">数据工程</span></h2>
@@ -463,6 +463,9 @@
       <span class="bulb">🔑</span>
       <div class="etext"><b>一句话总结：</b>软件工程从"人写规则"走向"数据 + 模型驱动"；数据工程从"服务 BI 报表"走向"<b>服务模型的训练与推理</b>"。这也是为什么"数据管道"和"AI 推理"会在今天融合。</div>
     </div>
+    <aside class="notes" hidden>
+      【选讲页】本页核心判断，在下一页"双向飞轮"里已被浓缩收口。时间紧张时可整页跳过、直接讲飞轮；时间充裕再展开左右双栏详述。约 1 分钟。
+    </aside>
   </div>
 </section>
 
@@ -599,8 +602,32 @@
     </div>
     <div class="explain frag" data-frag="4">
       <span class="bulb">🎯</span>
-      <div class="etext">本次分享聚焦其中最硬的一环——<b>"处理层 + 智能层"的融合</b>：如何让流式数据管道，<b>直接、可靠、高效</b>地调用 AI 模型。接下来，进入我们的真实实践。</div>
+      <div class="etext">这张图里，最硬的一环是<b>"处理层 + 智能层"的融合</b>。那么——它到底难在哪，又该从哪里破局？</div>
     </div>
+  </div>
+</section>
+
+<!-- ============ S 承上启下 · 从趋势收敛到一个工程问题（桥梁页） ============ -->
+<section class="slide" data-chapter="2" data-kicker="承上启下" data-title="从趋势，收敛到一个工程问题">
+  <div class="wrap">
+    <div class="kicker">Zoom In · 从世界观，到我们的战场</div>
+    <h2 class="title" style="margin-bottom:1rem">趋势讲完了——那它<span class="hl">具体落在哪一个问题上</span>？</h2>
+    <div class="grid g3 frag" data-frag="1">
+      <div class="card blue"><div class="card-h" style="font-size:15px"><span class="ic">🎯</span>以数据为中心</div><ul><li>胜负手从"堆算力"转向"喂什么数据"</li></ul></div>
+      <div class="card purple"><div class="card-h" style="font-size:15px"><span class="ic">🔁</span>AI × Data 双向飞轮</div><ul><li>模型能力回注数据，数据反哺更强模型</li></ul></div>
+      <div class="card green"><div class="card-h" style="font-size:15px"><span class="ic">🌊</span>管道边界消失</div><ul><li>不再"先搬运后计算"，而是流动中实时推理</li></ul></div>
+    </div>
+    <div class="center frag" data-frag="2" style="margin:.85rem 0 .1rem;color:var(--purple);font-size:1.7rem;font-family:var(--font-en);line-height:1">▼</div>
+    <div class="card yellow frag" data-frag="2" style="text-align:center;padding:1.05rem 1.4rem">
+      <div style="font-size:clamp(17px,1.7vw,24px);font-weight:800;line-height:1.5">这三股趋势，最终都压到同一个工程问题上——<br>如何让<span class="hl">流式数据管道</span>，直接、可靠、高效地<span class="hl" style="color:var(--yellow)">调用 AI 模型</span>？</div>
+    </div>
+    <div class="explain frag" data-frag="3">
+      <span class="bulb">🧭</span>
+      <div class="etext">前面 4 个平台级痛点（数据孤岛 / 离线在线不一致 / 成本高 / 迭代慢），归根到底都卡在<b>"处理层 × 智能层"的融合</b>上。这，就是我们过去两年"演进三部曲"要回答的<b>唯一问题</b>。</div>
+    </div>
+    <aside class="notes" hidden>
+      这是承上启下的收敛页：先用一句话回收前面三大趋势判断（左中右三张卡），然后把箭头一收——所有宏大叙事最终都压到"流式管道怎么高效调模型"这一个工程问题上。讲完这页，观众就知道：接下来不再是概念，而是我们怎么一步步啃下这块硬骨头。约 40 秒，语气要收、要笃定。
+    </aside>
   </div>
 </section>
 
@@ -619,7 +646,7 @@
     <div class="big-n num-en">03</div>
     <h2>演进三部曲</h2>
     <div class="accent"></div>
-    <div class="d-sub">先看清痛点，再讲我们怎么踩了两个坑，才走到今天的方案</div>
+    <div class="d-sub">围绕那一个问题——<b>怎么在数据流里高效调模型</b>——我们踩了两个坑，才走到今天</div>
     <div class="dim small" style="margin-top:1.7rem;letter-spacing:.08em">本章看点</div>
     <div class="chips" style="justify-content:center;gap:.6rem;margin-top:.7rem">
       <span class="chip">① 三大场景 & 痛点：GPU 5% · 迭代慢</span>
@@ -649,15 +676,16 @@
       <div class="frag" data-frag="2">
         <div class="card red">
           <div class="card-h"><span class="ic">🔥</span>业务痛点（拦路虎）</div>
+          <div class="dim small" style="margin:.1rem 0 .5rem">👇 这不是新痛点，正是前面 4 大平台痛点在我们业务里的<b style="color:var(--red)">具体形态</b></div>
           <ul>
-            <li><b>远程调用性能低</b>：GPU 利用率仅 5%–10%，资源浪费</li>
-            <li><b>故障恢复代价大</b>：无 Exactly-Once，重复 3%–5%，恢复 15–30 分钟</li>
-            <li><b>运维迭代成本高</b>：模型硬编码，迭代 2–3 天，每周人工重跑</li>
+            <li><b>远程调用性能低</b>：GPU 利用率仅 5%–10%，资源浪费<span class="dim small">　↳ 对应「推理成本高」</span></li>
+            <li><b>故障恢复代价大</b>：无 Exactly-Once，重复 3%–5%，恢复 15–30 分钟<span class="dim small">　↳ 对应「离线在线不一致」</span></li>
+            <li><b>运维迭代成本高</b>：模型硬编码，迭代 2–3 天，每周人工重跑<span class="dim small">　↳ 对应「迭代慢 / 治理弱」</span></li>
           </ul>
         </div>
       </div>
     </div>
-    <div class="center mt2 frag" data-frag="3"><span class="chip" style="font-size:18px;padding:.6em 1.4em">🤔 接下来，看我们如何一步步解决</span></div>
+    <div class="center mt2 frag" data-frag="3"><span class="chip" style="font-size:18px;padding:.6em 1.4em">这三座大山，我们没能一步登顶——而是踩了两个坑，才走到今天 👉</span></div>
   </div>
 </section>
 
